@@ -1,0 +1,600 @@
+﻿/* DEFAULTS
+----------------------------------------------------------*/
+
+body   
+{
+    background:#fff;
+    font-size: 2.00em;
+    font-family: Calibri;
+    margin: 0px;
+    padding: 0px;
+    color:Black ;
+}
+
+a:link, a:visited
+{
+    color: #034af3;
+}
+.watermark
+{
+    color:#999999;
+}
+
+a:hover
+{
+    color: #1d60ff;
+    text-decoration: none;
+}
+
+a:active
+{
+    color: #034af3;
+}
+
+p
+{
+    margin-bottom: 10px;
+    line-height: 1.6em;
+}
+
+
+/* HEADINGS   
+----------------------------------------------------------*/
+
+h1, h2, h3, h4, h5, h6
+{
+    font-size: 0.86em;
+    font-variant: small-caps;
+    text-transform: none;
+    font-weight: 100;
+    margin-bottom: 0px;
+}
+
+h1
+{
+    font-size: 0.86em;
+    padding-bottom: 0px;
+    margin-bottom: 0px;
+}
+
+h2
+{
+    font-size: 0.86em;
+    font-weight: 600;
+}
+
+h3
+{
+	
+    font-size: 1.2em;
+    font-weight:600;
+    
+}
+
+h4
+{
+    font-size: 1.1em;
+}
+
+h5, h6
+{
+    font-size: 1em;
+}
+h7
+{
+	font-size: 0.5em;
+}
+
+
+/* this rule styles <h1> and <h2> tags that are the 
+first child of the left and right table columns */
+.rightColumn > h1, .rightColumn > h2, .leftColumn > h1, .leftColumn > h2
+{
+    margin-top: 0px;
+}
+
+
+/* PRIMARY LAYOUT ELEMENTS   
+----------------------------------------------------------*/
+
+.page
+{
+    /*width: 960px;*/
+    width:90%;
+   background-color:#fff;
+    margin: 20px auto 0px auto;
+    /*border: 2px solid #292929;*/
+     -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -khtml-border-radius: 5px;
+    border-radius: 5px;
+  
+  position: relative;
+  bottom: 4px;
+  right: 4px;
+}
+
+.header
+{
+    position: relative;
+    margin: 0px;
+    padding: 0px;
+    background: #ffffff;
+    width: 100%;
+    text-align: center;
+}
+
+.header h1
+{
+    font-weight: 700;
+    margin: 0px;
+    padding: 0px 0px 0px 20px;
+    color: #f9f9f9;
+    border: none;
+    line-height: 2em;
+    font-size: 2em;
+}
+
+.main
+{
+    padding: 0px 12px;
+    margin: 12px 8px 8px 8px;
+    min-height: 420px;
+}
+
+.leftCol
+{
+    padding: 6px 0px;
+    margin: 12px 8px 8px 8px;
+    width: 200px;
+    min-height: 200px;
+}
+
+.footer
+{
+    color: #4e5766;
+    padding: 8px 0px 0px 0px;
+    margin: 0px auto;
+    text-align: center;
+    line-height: normal;
+}
+
+
+/* TAB MENU   
+----------------------------------------------------------*/
+
+div.hideSkiplink
+{
+    background-color:#03457e;
+    width:100%;
+}
+
+div.menu
+{
+    padding: 4px 0px 4px 8px;
+}
+
+div.menu ul
+{
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    width: auto;
+    font-size:18px;
+}
+
+div.menu ul li a, div.menu ul li a:visited
+{
+    background-color:#03457e;
+    border: 1px #03457e solid;
+    color: #dde4ec;
+    display: block;
+    line-height: 1.35em;
+    padding: 4px 20px;
+    text-decoration: none;
+    white-space: nowrap;
+    font: Calibri;
+}
+
+div.menu ul li a:hover
+{
+    background-color: #ffffff;
+    color: #A31919;
+    text-decoration: none;
+}
+
+div.menu ul li a:active
+{
+    background-color: #ffffff;
+    color: #cfdbe6;
+    text-decoration: none;
+}
+
+/* FORM ELEMENTS   
+----------------------------------------------------------*/
+
+legend 
+{
+    font-size: 0.6em;
+    padding: 10px 10px 10px 10px;
+    font:Helvetica;
+    font-weight:bold ;
+   
+   background-color:White;
+	color:Black;
+    padding:5px;
+   -moz-border-radius-bottomleft: 7px;
+ -moz-border-radius-bottomright: 7px;
+ -moz-border-radius-topleft: 5px;
+ -moz-border-radius-topright: 7px;
+ -webkit-border-radius: 7px;
+ border-radius: 3px;
+	
+}
+fieldset
+{
+	  border-color:#3E3E3E;
+	  background-color:#fff;
+	  -moz-border-radius-bottomleft: 10px;
+ -moz-border-radius-bottomright: 10px;
+ -moz-border-radius-topleft: 10px;
+ -moz-border-radius-topright: 10px;
+ -webkit-border-radius: 10px;
+ border-radius: 10px;
+ 
+	  
+}
+
+fieldset p 
+{
+	
+   border-color:#3E3E3E;
+	  background-color:#fff;
+	  -moz-border-radius-bottomleft: 10px;
+ -moz-border-radius-bottomright: 10px;
+ -moz-border-radius-topleft: 10px;
+ -moz-border-radius-topright: 10px;
+ -webkit-border-radius: 10px;
+ border-radius: 10px;
+}
+
+fieldset.login label, fieldset.register label, fieldset.changePassword label
+{
+    display: block;
+}
+
+fieldset label.inline 
+{
+    display: inline;
+}
+
+
+
+input.textEntry 
+{
+    width: 320px;
+    border: 1px solid #ccc;
+}
+
+input.passwordEntry 
+{
+    width: 320px;
+    border: 1px solid #ccc;
+}
+
+div.accountInfo
+{
+    width: 42%;
+}
+
+/* MISC  
+----------------------------------------------------------*/
+
+.clear
+{
+    clear: both;
+}
+
+.title
+{
+    display: block;
+    float: left;
+    text-align: left;
+    width: auto;
+}
+
+.loginDisplay
+{
+    font-size: 1.1em;
+    display: block;
+    text-align: right;
+    padding: 10px;
+    color: White;
+}
+
+.loginDisplay a:link
+{
+    color: white;
+}
+
+.loginDisplay a:visited
+{
+    color: white;
+}
+
+.loginDisplay a:hover
+{
+    color: white;
+}
+
+.failureNotification
+{
+    font-size: 1.2em;
+    color: Red;
+}
+
+.bold
+{
+    font-weight: bold;
+}
+
+.submitButton
+{
+    text-align: right;
+    padding-right: 10px;
+}
+tr
+{
+font-family:Calibri;
+	font-size:14px;
+	height:30px;
+	
+}
+
+td
+{
+	font-family:Calibri;
+	font-size:14px;
+	color:black;
+	
+}
+table
+{
+	background-color:#fff;
+	border:none;
+	padding:0;
+
+}
+.Button
+{
+	text-align:center ;
+	background-color:#333333;
+	color:#FFE8A6;
+	font:Helvetica;
+	font-size:14px ;
+	border-bottom-style:solid;
+	border-right-color:#FFE8A6;
+	border-right-style:solid ;
+	border-color:#FFE8A6;
+	border:1px,solid,#FFE8A6;
+	height:30px;
+	-moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -khtml-border-radius: 10px;
+    border-radius: 10px;
+    
+}
+
+.Label
+{
+	font:Calibri;
+	font-size:16px ;
+	font-weight:bold ; 
+	color:white;
+}
+
+.DropDown
+{
+	background-color:#fff;
+	color:#000;
+	width :200px;
+	font:Calibri;
+	font-size:11px ;
+	font-weight:bold;
+	 -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -khtml-border-radius: 5px;
+    border-radius: 5px;
+    height:25px;
+    border-bottom-style:solid;
+	border-right-color:black;
+	border-right-style:solid ;
+	border-color:black;
+	border-left-color:black;
+    border-left-style:solid;
+    border-top-color:black;
+    border-top-style:solid;
+    
+	
+}
+.Textbox
+{
+	background-color:#fff;
+	color:#000;
+	font:Calibri;
+	font-size:11px ;
+	font-weight:bold;
+	text-transform:uppercase;
+	-moz-border-radius: 50px;
+    -webkit-border-radius: 5px;
+    -khtml-border-radius: 5px;
+    border-radius: 5px;
+    height:20px;
+    border-left-color:black;
+    border-left-style:solid;
+    border-top-color:black;
+    border-top-style:solid;
+     border-bottom-style:solid;
+	border-right-color:black;
+	border-right-style:solid ;
+	border-color:black;
+}
+.RadioButton
+{
+	background-color:#333333;
+	color:#FFE8A6;
+	font:Calibri;
+	font-size:11px ;
+	font-weight:bold;
+	text-transform:uppercase;
+	 border-bottom-style:solid;
+	border-right-color:white;
+	border-right-style:solid ;
+	border-color:white;
+	border-left-color:White;
+    border-left-style:solid;
+    border-top-color:White;
+    border-top-style:solid;
+    -moz-border-radius: 50px;
+    -webkit-border-radius: 5px;
+    -khtml-border-radius: 5px;
+    border-radius: 5px;
+	
+}
+
+.MyCalendar .ajax__calendar_container {
+    border:1px solid #646464;
+    background-color: lemonchiffon;
+    color: red;
+    
+}
+
+
+
+/*css grid style*/
+.Grid 
+{
+	 border: solid 2px #FFE8A6;
+        
+ }
+ .Grid td
+ {
+ border: solid 1px #FFE8A6;
+ margin: 1px 1px 1px 1px;
+ padding: 1px 1px 1px 1px;
+ text-align: center;
+ }
+ .GridHeader
+ {
+ font-weight: bold;
+ background-color: #FFE8A6;
+ color :Black;
+ 
+ 
+ }
+ .GridItem
+ {
+ background-color:white;
+ }
+ 
+.GridAltItem
+ {
+ background-color: white;
+ }
+ .Grid Footer
+ {
+ 	 font-weight: bold;
+ background-color: #FFE8A6;
+ color :Black;
+ }
+ 
+ .mGrid { width: 100%; background-color: #fff; margin: 5px 0 10px 0; border: solid 1px #525252; border-collapse:collapse; }
+    .mGrid td { padding: 2px; border: solid 1px #c1c1c1; color: #717171; }
+    .mGrid th { padding: 4px 2px; color: #fff; background: #424242  url(styles/grd_head.png) repeat-x top; border-left: solid 1px #525252; font-size: 0.9em; }
+.mGrid .alt { background: #fcfcfc  url(styles/grd_alt.png) repeat-x top; }
+.mGrid .pgr {background: #424242  url(styles/grd_pgr.png) repeat-x top; }
+    .mGrid .pgr table { margin: 5px 0; }
+    .mGrid .pgr td { border-width: 0; padding: 0 6px; border-left: solid 1px #666; font-weight: bold; color: #fff; line-height: 12px; }   
+    .mGrid .pgr a { color: #666; text-decoration: none; }
+    .mGrid .pgr a:hover { color: #000; text-decoration: none; }
+
+.modalBackground { 
+background-color:#fff; 
+filter:alpha(opacity=70); 
+opacity:0.7px; 
+} 
+
+#ShowId
+{
+	    border-color: rgb(178, 178, 178);
+    right: 10px !important;
+    top: 96px;
+    position: fixed;
+    background-color: rgb(178, 178, 178);
+}
+
+
+.w3-red, .w3-hover-red:hover {
+    color: #fff!important;
+    background-color: #f44336!important;
+}
+.w3-padding-large {
+    padding: 12px 24px!important;
+}
+.w3-jumbo {
+    font-size: 20px!important;
+}
+.w3-badge {
+    border-radius: 0%;
+}
+.w3-badge, .w3-tag, .w3-sign {
+    background-color: #000;
+    color: #fff;
+    display: inline-block;
+    padding-left: 8px;
+    padding-right: 8px;
+    text-align: center;
+}
+
+.w3-blue, .w3-hover-blue:hover {
+    color: #fff!important;
+    background-color: #369cf4!important;
+}
+
+.w3-green, .w3-hover-blue:hover {
+    color: #fff!important;
+    background-color: #12a217!important;
+}
+
+#chart-area ul {
+  list-style: none;
+}
+#chart-area ul li {
+  display: inline-block;
+  padding-left: 30px;
+  position: relative;
+  margin-bottom: 4px;
+  border-radius: 5px;
+  padding: 2px 8px 2px 28px;
+  font-size: 14px;
+  cursor: default;
+  -webkit-transition: background-color 200ms ease-in-out;
+  -moz-transition: background-color 200ms ease-in-out;
+  -o-transition: background-color 200ms ease-in-out;
+  transition: background-color 200ms ease-in-out;
+}
+#chart-area li span {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 20px;
+  height: 100%;
+  border-radius: 5px;
+}
+
+#js-legend
+{
+	    display: inline-block;
+    vertical-align: top;
+}

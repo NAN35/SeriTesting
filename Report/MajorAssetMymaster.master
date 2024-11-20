@@ -1,0 +1,215 @@
+﻿<%@ master language="C#" autoeventwireup="true" inherits="MajorAssetMymaster, App_Web_majorassetmymaster.master.1933d7c" %>
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="asp" %>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+   <title></title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script type="text/javascript" src="../Scripts/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../css/bootstrapValidator.css"></script>
+    <link href="../css/bootstrap.min.css" rel="stylesheet" />
+    <link href="../font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <link href="../css/sb-admin.css" rel="stylesheet" />
+    <style>
+   .top_header {
+        /*border: 0px solid red;
+        background-color: #140035;
+        border-bottom: 0px solid white;*/
+    margin-top:40px;
+    height:60px;
+    padding: 0;
+    font-size: 14px;
+    transition: all 0.1s;
+    overflow: hidden;
+    color: rgba(255, 255, 255, 0.8);
+    }
+
+    .top_container {
+        height:90px;
+        /* border: 1px solid #718fbc; */
+        /* background-color: #289a6a; */
+        width: 100%;
+        max-width: 100%;
+    }
+
+   .header2_col1 {
+        border: 0px solid red;
+        padding: 3px;
+        text-align: center;
+        padding-top: 3px;
+        width: 25%;
+    }
+
+    .header2_col2 {
+        border: 0px solid blue;
+        padding: 3px;
+        text-align: center;
+        width: 50%;
+    }
+
+    .header2_col3 {
+        border: 0px solid red;
+        padding: 3px;
+        text-align: center;
+        width: 25%;
+        padding-top: 5px;
+    }
+
+
+
+    .cm {
+        margin: 0px;
+        font-weight: 600;
+        color: #0e0e0e;
+        font-size: 13px;
+    }
+
+    .kar_logo {
+        height: 40px;
+        padding: 2px;
+        /*border-radius: 50%;
+        border: 0px solid #bfbfbf;*/
+        /*box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
+        margin-bottom: 2px;
+    }
+       .cm_logo {
+        /*height: 70px;
+        padding: 2px;*/
+
+        height: 38px;
+        padding: 2px;
+        border-radius: 50%;
+        border: 0px solid #bfbfbf;
+        /*box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
+        margin-bottom: 2px;
+    }
+    .ceg_logo {
+        height:45px;
+        padding: 2px;
+    }
+
+    .scsp {
+        color: #000000;
+        margin: 0px;
+        font-weight: 700;
+        font-size: 14px;
+        font-family: system-ui;
+    }
+
+
+
+
+    </style>
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <asp:ToolkitScriptManager ID="ToolkitScriptManager1" runat="server">
+    </asp:ToolkitScriptManager>
+      
+    <nav id="NavigationMenu_Others" runat="server" class="navbar navbar-default navbar-fixed-top"
+        role="navigation">
+ <div id="GPL" runat="server" style="width: 100%;background-color: #5b50c5; color: white; left: 0px; ">
+                
+         <div style="background-color:white">
+            <div class="col-lg-4 col-md-4 col-sm-4 header2_col1">
+                
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 header2_col2">
+              <img src="../Images/admin.png" class="cm_logo">
+                <%--<p class="scspcm">Department of Sericulture</p>--%>
+                <p class="scspdeptsub">Government of Karnataka</p>
+             
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 header2_col3">
+             <%--   <img src="assets/img/logo/min.png" class="cm_logo">
+                <p class="scspcm">Hon'ble Social Welfare Department  Minister </p>
+                <p class="scspdeptsub"><span>Government of Karnataka</span></p>--%>
+            </div>
+        </div>
+</div>
+
+     <div class="container">
+       
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse" value="MENU">
+                                <span class="sr-only">Toggle navigation</span>
+                                MENU
+                            </button>
+                            <div class="navbar-brand">
+
+                               <%-- <a href="login" style="color:white"></a>
+
+                                <img src="../Images/samajakalyana.png" width="250" alt="scsplogo" />--%>
+                            </div>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav" id="menu" runat="server">               
+                    <li><a href="login">Home</a></li> 
+                    <li class="dropdown">
+                    <a  href="#" class="dropdown-toggle" data-toggle="dropdown"> <span>Reports1</span> <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="text1.aspx">Marketing</a></li>
+                        <li><a href="test2.aspx">Grainage</a></li>
+                    </ul>
+                    </li>
+                  
+                      <li class="dropdown">
+                        <a  href="#" class="dropdown-toggle" data-toggle="dropdown"> <span>Reports2</span> <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                          
+                            <li><a href="test3.aspx">1</a></li>
+                             <li><a href="test4.aspx">2</a></li>
+                          
+                   
+                        </ul>
+                    </li>
+                                
+                                        
+                </ul>
+              
+
+                <%-- <ul class="nav navbar-nav navbar-right">
+                     <li class="dropdown">
+                    <a  href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> <span id="profilename" runat="server"></span> <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        
+                        <li><a href="ChangePassword.aspx"><i class="fa fa-fw fa-key"></i> Change Password</a></li>
+                        <li class="divider"></li>
+                         <li>
+                             <asp:LinkButton ID="btnSignOut" class="fa fa-fw fa-power-off" runat="server" Text="Log Out"
+                                    OnClick="btnSignOut_Click" ></asp:LinkButton>
+                         </li>
+                    </ul>--%>
+            </div>
+            
+              
+        
+               
+            </div>
+         
+        </nav>
+  
+         <br /> <br /><br/><br /><br />
+   <%-- <h3 style="text-align: center; color: steelblue; margin-top: 4.2em !important">
+        <span>Work Monitoring System</span></h3>--%>
+    <asp:ContentPlaceHolder ID="MainContent" runat="server">
+        <div class="main">
+        </div>
+    </asp:ContentPlaceHolder>
+    <%-- <div class="clear">
+        </div>--%>
+    <div>
+        <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+        </asp:ContentPlaceHolder>
+    </div>
+    <hr />
+    <div class="footer">
+    </div>
+    </form>
+</body>
+</html>
