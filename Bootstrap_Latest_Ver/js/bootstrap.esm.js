@@ -943,8 +943,18 @@ class Button extends BaseComponent {
     return this.each(function () {
       const data = Button.getOrCreateInstance(this);
 
-      if (config === 'toggle') {
-        data[config]();
+      // if (config === 'toggle') {
+      //   data[config]();
+      // }
+
+      const allowedFunctions = {
+        toggle: data.toggle
+      };
+      
+      if (allowedFunctions.hasOwnProperty(config)) {
+        allowedFunctions[config]();
+      } else {
+        console.error('Invalid function requested');
       }
     });
   }
@@ -1891,7 +1901,12 @@ class Collapse extends BaseComponent {
         throw new TypeError(`No method named "${config}"`);
       }
 
-      data[config]();
+      // data[config]();
+      if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
+        data[config]();
+      } else {
+        console.log('Config key not found or not a function');
+      }
     }
   }
 
@@ -2292,7 +2307,12 @@ class Dropdown extends BaseComponent {
         throw new TypeError(`No method named "${config}"`);
       }
 
-      data[config]();
+      // data[config]();
+      if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
+        data[config]();
+      } else {
+        console.log('Config key not found or not a function');
+      }
     }
   }
 
@@ -3046,7 +3066,10 @@ class Modal extends BaseComponent {
         throw new TypeError(`No method named "${config}"`);
       }
 
-      data[config](relatedTarget);
+      // data[config](relatedTarget);
+      if (typeof data[config] === 'function') {
+        data[config](relatedTarget);
+      }
     });
   }
 
@@ -3299,7 +3322,12 @@ class Offcanvas extends BaseComponent {
         throw new TypeError(`No method named "${config}"`);
       }
 
-      data[config](this);
+      // data[config](this);
+      if (typeof data[config] === 'function') {
+        data[config](this);
+      } else {
+        console.error(`No method named "${config}"`);
+      }
     });
   }
 
@@ -4132,7 +4160,12 @@ class Tooltip extends BaseComponent {
           throw new TypeError(`No method named "${config}"`);
         }
 
-        data[config]();
+        // data[config]();
+        if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
+          data[config]();
+        } else {
+          console.log('Config key not found or not a function');
+        }
       }
     });
   }
@@ -4281,7 +4314,13 @@ class Popover extends Tooltip {
           throw new TypeError(`No method named "${config}"`);
         }
 
-        data[config]();
+        // data[config]();
+
+        if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
+          data[config]();
+        } else {
+          console.log('Config key not found or not a function');
+        }
       }
     });
   }
@@ -4524,7 +4563,12 @@ class ScrollSpy extends BaseComponent {
         throw new TypeError(`No method named "${config}"`);
       }
 
-      data[config]();
+      // data[config]();
+      if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
+        data[config]();
+      } else {
+        console.log('Config key not found or not a function');
+      }
     });
   }
 
@@ -4712,7 +4756,12 @@ class Tab extends BaseComponent {
           throw new TypeError(`No method named "${config}"`);
         }
 
-        data[config]();
+        // data[config]();
+        if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
+          data[config]();
+        } else {
+          console.log('Config key not found or not a function');
+        }
       }
     });
   }

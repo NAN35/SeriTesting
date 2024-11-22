@@ -1036,7 +1036,8 @@
       return this.each(function () {
         const data = Alert.getOrCreateInstance(this);
 
-        if (config === "close") {
+        const validMethods = ["close"];
+        if (validMethods.includes(config)) {
           data[config](this);
         }
       });
@@ -3444,7 +3445,11 @@
           throw new TypeError(`No method named "${config}"`);
         }
 
-        data[config](relatedTarget);
+        if (typeof data[config] === "function") {
+          data[config](relatedTarget);
+        } else {
+          throw new TypeError(`No method named "${config}"`);
+        }
       });
     }
   }
@@ -3710,7 +3715,11 @@
           throw new TypeError(`No method named "${config}"`);
         }
 
-        data[config](this);
+        if (typeof data[config] === "function") {
+          data[config](this);
+        } else {
+          throw new TypeError(`No method named "${config}"`);
+        }
       });
     }
   }
@@ -4661,7 +4670,11 @@
             throw new TypeError(`No method named "${config}"`);
           }
 
-          data[config]();
+          if (typeof data[config] === "function") {
+            data[config]();
+          } else {
+            throw new TypeError(`No method named "${config}"`);
+          }
         }
       });
     }
@@ -4824,7 +4837,12 @@
             throw new TypeError(`No method named "${config}"`);
           }
 
-          data[config]();
+          // data[config]();
+          if (typeof data[config] === "function") {
+            data[config]();
+          } else {
+            throw new TypeError(`No method named "${config}"`);
+          }
         }
       });
     }
@@ -5113,7 +5131,11 @@
           throw new TypeError(`No method named "${config}"`);
         }
 
-        data[config]();
+        if (typeof data[config] === "function") {
+          data[config]();
+        } else {
+          throw new TypeError(`No method named "${config}"`);
+        }
       });
     }
   }
@@ -5321,7 +5343,11 @@
             throw new TypeError(`No method named "${config}"`);
           }
 
-          data[config]();
+          if (typeof data[config] === "function") {
+            data[config]();
+          } else {
+            throw new TypeError(`No method named "${config}"`);
+          }
         }
       });
     }
