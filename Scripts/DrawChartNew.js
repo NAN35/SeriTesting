@@ -100,7 +100,10 @@ function horizonralgraph() {
 	     barShowStroke: false
 	 });
 
-	 document.getElementById('js-legend').innerHTML = chart.generateLegend();
+	//  document.getElementById('js-legend').innerHTML = chart.generateLegend();
+    const legend = chart.generateLegend(); // Assuming chart.generateLegend() returns a safe string
+
+    document.getElementById('js-legend').textContent = legend; // Using textContent instead of innerHTML to prevent XSS vulnerabilities
 }
 
 function bargrapgh() {

@@ -98,7 +98,17 @@ function horizonralgraph() {
 	     barShowStroke: false
 	 });
 
-	 document.getElementById('js-legend').innerHTML = chart.generateLegend();
+	//  document.getElementById('js-legend').innerHTML = chart.generateLegend();
+    function escapeHTML(html) {
+        return html.replace(/&/g, "&amp;")
+                   .replace(/</g, "&lt;")
+                   .replace(/>/g, "&gt;")
+                   .replace(/"/g, "&quot;")
+                   .replace(/'/g, "&#039;");
+    }
+    
+    // Assign sanitized data to innerHTML
+    document.getElementById('js-legend').innerHTML = escapeHTML(chart.generateLegend());
 }
 
 function bargrapgh() {
