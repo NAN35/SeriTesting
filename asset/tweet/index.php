@@ -46,30 +46,28 @@ class ezTweet {
 		$this->message = '';
 
 		// Set server-side debug params
-		if($this->debug === true) {
-			error_reporting(-1);
-		} else {
-			error_reporting(0);
-		}
+    if($this->debug === true) {
+      error_reporting(-1);
+    }
 	}
 
-	public function fetch() {
-		echo json_encode(
-			array(
-				'response' => json_decode($this->getJSON(), true),
-				'message' => ($this->debug) ? $this->message : false
-			)
-		);
-	}
+  public function fetch() {
+    echo htmlspecialchars(json_encode(
+      array(
+        'response' => json_decode(htmlspecialchars($this->getJSON(), ENT_QUOTES, 'UTF-8'), true),
+        'message' => ($this->debug) ? htmlspecialchars($this->message, ENT_QUOTES, 'UTF-8') : false
+      )
+    ), ENT_QUOTES, 'UTF-8');
+  }
 
 	private function getJSON() {
 		if($this->cache_enabled === true) {
-			$CFID = $this->generateCFID();
-			$cache_file = $this->cache_dir.$CFID;
+      $CFID = $this->generateCFID();
+      $cache_file = realpath($this->cache_dir.$CFID);
 
-			if(file_exists($cache_file) && (filemtime($cache_file) > (time() - 60 * intval($this->cache_interval)))) {
-				return file_get_contents($cache_file, FILE_USE_INCLUDE_PATH);
-			} else {
+      if($cache_file && strpos($cache_file, realpath($this->sanitizePath($this->cache_dir))) === 0 && $this->isValidPath($cache_file) && $this->isValidPath($cache_file) && file_exists(realpath($this->sanitizePath($cache_file))) && (filemtime($cache_file) > (time() - 60 * intval($this->cache_interval)))) {
+        return file_get_contents($cache_file, FILE_USE_INCLUDE_PATH);
+      } else {
 
 				$JSONraw = $this->getTwitterJSON();
 				$JSON = $JSONraw['response'];
@@ -143,17 +141,33 @@ class ezTweet {
 		return $tmhOAuth->response;
 	}
 
-	private function generateCFID() {
-		// The unique cached filename ID
-		return md5(serialize($_POST)).'.json';
-	}
+  private function generateCFID() {
+    // The unique cached filename ID
+    return hash('sha256', serialize($_POST)).'.json';
+  }
 
-	private function pathify(&$path) {
-		// Ensures our user-specified paths are up to snuff
-		$path = realpath($path).'/';
-	}
+  private function pathify(&$path) {
+    // Ensures our user-specified paths are up to snuff
+    $path = realpath($this->sanitizePath($path)).'/';
+  }
 
-	private function consoleDebug($message) {
+  private function sanitizePath($path) {
+    // Remove any null bytes
+    $path = str_replace("\0", '', $path);
+    // Normalize the path
+    $path = preg_replace('/[\/\\\\]+/', DIRECTORY_SEPARATOR, $path);
+    // Remove any relative paths
+    $path = preg_replace('/\.\.[\/\\\\]/', '', $path);
+    return $path;
+  }
+
+  private function isValidPath($path) {
+    $realBase = realpath($this->cache_dir);
+    $realUserPath = realpath($path);
+    return $realUserPath && strpos($realUserPath, $realBase) === 0;
+  }
+
+  private function consoleDebug($message) {
 		if($this->debug === true) {
 			$this->message .= 'tweet.js: '.$message."\n";
 		}
@@ -180,6 +194,10 @@ class tmhOAuth {
   const VERSION = '0.7.4';
 
   var $response = array();
+  var $config = array();
+  private $auth_params = array();
+  private $base_string = '';
+  private $signing_key = '';
 
   /**
    * Creates a new tmhOAuth object
@@ -228,8 +246,8 @@ class tmhOAuth {
         'curl_ssl_verifypeer'        => true,
 
         // you can get the latest cacert.pem from here http://curl.haxx.se/ca/cacert.pem
-        'curl_cainfo'                => dirname(__FILE__) . DIRECTORY_SEPARATOR . 'cacert.pem',
-        'curl_capath'                => dirname(__FILE__),
+        'curl_cainfo'                => __DIR__ . DIRECTORY_SEPARATOR . 'cacert.pem',
+        'curl_capath'                => __DIR__,
 
         'curl_followlocation'        => false, // whether to follow redirects or not
 
@@ -289,8 +307,8 @@ class tmhOAuth {
       $sequence = array_merge(range(0,9), range('A','Z'), range('a','z'));
       $length = $length > count($sequence) ? count($sequence) : $length;
       shuffle($sequence);
-
       $prefix = $include_time ? microtime() : '';
+      $this->config['nonce'] = hash('sha256', substr($prefix . implode('', $sequence), 0, $length));
       $this->config['nonce'] = md5(substr($prefix . implode('', $sequence), 0, $length));
     }
   }
@@ -314,7 +332,11 @@ class tmhOAuth {
    */
   private function safe_encode($data) {
     if (is_array($data)) {
-      return array_map(array($this, 'safe_encode'), $data);
+      $encoded = array();
+      foreach ($data as $key => $value) {
+        $encoded[$key] = $this->safe_encode($value);
+      }
+      return $encoded;
     } else if (is_scalar($data)) {
       return str_ireplace(
         array('+', '%7E'),
@@ -335,7 +357,11 @@ class tmhOAuth {
    */
   private function safe_decode($data) {
     if (is_array($data)) {
-      return array_map(array($this, 'safe_decode'), $data);
+      $decoded = array();
+      foreach ($data as $key => $value) {
+        $decoded[$key] = $this->safe_decode($value);
+      }
+      return $decoded;
     } else if (is_scalar($data)) {
       return rawurldecode($data);
     } else {
@@ -454,7 +480,9 @@ class tmhOAuth {
 
     // Parameters are sorted by name, using lexicographical byte value ordering.
     // Ref: Spec: 9.1.1 (1)
-    uksort($this->signing_params, 'strcmp');
+    uksort($this->signing_params, function($a, $b) {
+      return strcmp($a, $b);
+    });
 
     // encode. Also sort the signed parameters from the POST parameters
     foreach ($this->signing_params as $k => $v) {
@@ -534,10 +562,10 @@ class tmhOAuth {
     unset($this->headers['Authorization']);
 
     uksort($this->auth_params, 'strcmp');
-    if (!$this->config['as_header']) :
+    if (!$this->config['as_header']) {
       $this->request_params = array_merge($this->request_params, $this->auth_params);
       return;
-    endif;
+    }
 
     foreach ($this->auth_params as $k => $v) {
       $kv[] = "{$k}=\"{$v}\"";
@@ -566,7 +594,7 @@ class tmhOAuth {
       $this->prepare_base_string();
       $this->prepare_signing_key();
 
-      $this->auth_params['oauth_signature'] = $this->safe_encode(
+            'sha1', $this->base_string, $this->signing_key, false
         base64_encode(
           hash_hmac(
             'sha1', $this->base_string, $this->signing_key, true
@@ -750,12 +778,8 @@ class tmhOAuth {
       return 0;
 
     $metrics = $this->update_metrics();
-    $stop = call_user_func(
-      $this->config['streaming_callback'],
-      $content,
-      strlen($content),
-      $metrics
-    );
+    $callback = $this->config['streaming_callback'];
+    $stop = $callback($content, strlen($content), $metrics);
     $this->buffer = $buffered[1];
     if ($stop)
       return 0;
@@ -867,6 +891,9 @@ class tmhOAuth {
       return 0;
 
     // do it!
+    // Sanitize URL
+    $this->url = filter_var($this->url, FILTER_SANITIZE_URL);
+
     $response = curl_exec($c);
     $code = curl_getinfo($c, CURLINFO_HTTP_CODE);
     $info = curl_getinfo($c);
@@ -1054,7 +1081,7 @@ class tmhUtilities {
     elseif ( is_array($obj) )
       print_r($obj);
     else
-      echo $obj;
+      echo htmlspecialchars($obj, ENT_QUOTES, 'UTF-8');
     if (!self::is_cli())
       echo '</pre>';
   }
@@ -1107,9 +1134,10 @@ class tmhUtilities {
    * @return the text entered by the user
    */
   public static function read_input($prompt) {
-    echo $prompt;
-    $handle = fopen("php://stdin","r");
+    echo htmlspecialchars($prompt, ENT_QUOTES, 'UTF-8');
+    $handle = fopen("php://stdin", "r");
     $data = fgets($handle);
+    fclose($handle);
     return trim($data);
   }
 
@@ -1123,12 +1151,12 @@ class tmhUtilities {
    * @url http://www.dasprids.de/blog/2008/08/22/getting-a-password-hidden-from-stdin-with-php-cli
    */
   public static function read_password($prompt, $stars=false) {
-    echo $prompt;
+    echo htmlspecialchars($prompt, ENT_QUOTES, 'UTF-8');
     $style = shell_exec('stty -g');
 
     if ($stars === false) {
       shell_exec('stty -echo');
-      $password = rtrim(fgets(STDIN), "\n");
+      $password = rtrim(stream_get_line(STDIN, 1024, PHP_EOL), "\n");
     } else {
       shell_exec('stty -icanon -echo min 1 time 0');
       $password = '';
@@ -1143,14 +1171,14 @@ class tmhUtilities {
           }
         else
           fwrite(STDOUT, "*");
-          $password .= $char;
+          $password .= htmlspecialchars($char, ENT_QUOTES, 'UTF-8');
         endif;
       endwhile;
     }
 
     // Reset
-    shell_exec('stty ' . $style);
-    echo PHP_EOL;
+    shell_exec('stty ' . escapeshellarg($style));
+    echo htmlspecialchars(PHP_EOL, ENT_QUOTES, 'UTF-8');
     return $password;
   }
 

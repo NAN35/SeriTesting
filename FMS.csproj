@@ -50,10 +50,12 @@
     <Reference Include="System.Web.ApplicationServices" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Payments.aspx" />
     <Content Include="Account\ChangePassword.aspx" />
     <Content Include="Account\ChangePasswordSuccess.aspx" />
-
     <Content Include="Account\Login.aspx" />
     <Content Include="Account\Register.aspx" />
     <Content Include="Images\fullvs.jpg" />
@@ -85,12 +87,10 @@
       <DependentUpon>manage.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-
     <Compile Include="managedata.aspx.cs">
       <DependentUpon>managedata.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    
     <Compile Include="Payments.aspx.designer.cs">
       <DependentUpon>Payments.aspx</DependentUpon>
     </Compile>
