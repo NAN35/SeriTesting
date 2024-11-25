@@ -49,7 +49,6 @@
       );
     })();
   });
-})(window.jQuery);
 /* ==========================================================
  * bootstrap-alert.js v2.3.2
  * http://twitter.github.com/bootstrap/javascript.html#alerts
@@ -75,10 +74,45 @@
   /* ALERT CLASS DEFINITION
    * ====================== */
 
-  var dismiss = '[data-dismiss="alert"]',
-    Alert = function (el) {
+  var dismiss = '[data-dismiss="alert"]';
+
+  class Alert {
+    constructor(el) {
       $(el).on("click", dismiss, this.close);
-    };
+    }
+
+    close(e) {
+      var $this = $(this),
+        selector = $this.attr("data-target"),
+        $parent;
+
+      if (!selector) {
+        selector = $this.attr("href");
+        selector = selector && selector.replace(/.*(?=#[^\s]*$)/, ""); //strip for ie7
+      }
+
+      $parent = $(selector);
+
+      e && e.preventDefault();
+
+      $parent.length ||
+        ($parent = $this.hasClass("alert") ? $this : $this.parent());
+
+      $parent.trigger((e = $.Event("close")));
+
+      if (e.isDefaultPrevented()) return;
+
+      $parent.removeClass("in");
+
+      function removeElement() {
+        $parent.trigger("closed").remove();
+      }
+
+      $.support.transition && $parent.hasClass("fade")
+        ? $parent.on($.support.transition.end, removeElement)
+        : removeElement();
+    }
+  }
 
   Alert.prototype.close = function (e) {
     var $this = $(this),
@@ -166,10 +200,12 @@
   /* BUTTON PUBLIC CLASS DEFINITION
    * ============================== */
 
-  var Button = function (element, options) {
-    this.$element = $(element);
-    this.options = $.extend({}, $.fn.button.defaults, options);
-  };
+  class Button {
+    constructor(element, options) {
+      this.$element = $(element);
+      this.options = $.extend({}, $.fn.button.defaults, options);
+    }
+  }
 
   Button.prototype.setState = function (state) {
     var d = "disabled",
@@ -237,7 +273,9 @@
     function (e) {
       var $btn = $(e.target);
       if (!$btn.hasClass("btn")) $btn = $btn.closest(".btn");
-      $btn.button("toggle");
+      if ($btn.length) {
+        $btn.button("toggle");
+      }
     }
   );
 })(window.jQuery);
@@ -267,7 +305,7 @@
    * ========================= */
 
   var Carousel = function (element, options) {
-    this.$element = $(element);
+    this.$element = $(document.createElement('div')).append(element).find('*').first();
     this.$indicators = this.$element.find(".carousel-indicators");
     this.options = options;
     this.options.pause == "hover" &&
@@ -311,9 +349,13 @@
         return this.pause().cycle();
       }
 
+      var sanitizedPos = parseInt(pos, 10);
+      if (isNaN(sanitizedPos) || sanitizedPos < 0 || sanitizedPos >= this.$items.length) {
+        throw new Error("Invalid position value");
+      }
       return this.slide(
-        pos > activeIndex ? "next" : "prev",
-        $(this.$items[pos])
+        sanitizedPos > activeIndex ? "next" : "prev",
+        $(this.$items[sanitizedPos])
       );
     },
 
@@ -342,6 +384,10 @@
     },
 
     slide: function (type, next) {
+      var allowedTypes = ["next", "prev"];
+      if (!allowedTypes.includes(type)) {
+        throw new Error("Invalid type value");
+      }
       var $active = this.$element.find(".item.active"),
         $next = next || $active[type](),
         isCycling = this.interval,
@@ -421,7 +467,7 @@
       if (!data) $this.data("carousel", (data = new Carousel(this, options)));
       if (typeof option == "number") {
         data.to(option);
-      } else if (action && typeof data[action] === "function") {
+      } else if (action && typeof data[action] === "function" && ['next', 'prev', 'pause', 'cycle'].includes(action)) {
         data[action]();
       } else if (options.interval) {
         data.pause().cycle();
@@ -495,16 +541,18 @@
   /* COLLAPSE PUBLIC CLASS DEFINITION
    * ================================ */
 
-  var Collapse = function (element, options) {
-    this.$element = $(element);
-    this.options = $.extend({}, $.fn.collapse.defaults, options);
+  class Collapse {
+    constructor(element, options) {
+      this.$element = $(element);
+      this.options = $.extend({}, $.fn.collapse.defaults, options);
 
-    if (this.options.parent) {
-      this.$parent = $(this.options.parent);
+      if (this.options.parent) {
+        this.$parent = $(this.options.parent);
+      }
+
+      this.options.toggle && this.toggle();
     }
-
-    this.options.toggle && this.toggle();
-  };
+  }
 
   Collapse.prototype = {
     constructor: Collapse,
@@ -532,14 +580,19 @@
 
       this.$element[dimension](0);
       this.transition("addClass", $.Event("show"), "shown");
-      var validDimensions = ["width", "height"];
-      var validScrolls = ["scrollWidth", "scrollHeight"];
-      if (
-        validDimensions.includes(dimension) &&
-        validScrolls.includes(scroll)
-      ) {
-        $.support.transition &&
-          this.$element[dimension](this.$element[0][scroll]);
+      switch (dimension) {
+        case "width":
+          if (scroll === "scrollWidth") {
+            $.support.transition && this.$element.width(this.$element[0].scrollWidth);
+          }
+          break;
+        case "height":
+          if (scroll === "scrollHeight") {
+            $.support.transition && this.$element.height(this.$element[0].scrollHeight);
+          }
+          break;
+        default:
+          throw new Error("Invalid dimension or scroll value");
       }
     },
 
@@ -567,8 +620,13 @@
     reset: function (size) {
       var dimension = this.dimension();
 
-      this.$element.removeClass("collapse")[dimension](size || "auto")[0]
-        .offsetWidth;
+      var validDimensions = ["width", "height"];
+      if (validDimensions.includes(dimension)) {
+        this.$element.removeClass("collapse")[dimension](size || "auto")[0]
+          .offsetWidth;
+      } else {
+        throw new Error("Invalid dimension value");
+      }
 
       this.$element[size !== null ? "addClass" : "removeClass"]("collapse");
 
@@ -589,7 +647,11 @@
 
       this.transitioning = 1;
 
-      this.$element[method]("in");
+      if (typeof this.$element[method] === "function") {
+        this.$element[method]("in");
+      } else {
+        throw new Error("Invalid method value");
+      }
 
       $.support.transition && this.$element.hasClass("collapse")
         ? this.$element.one($.support.transition.end, complete)
@@ -617,7 +679,7 @@
           typeof option == "object" && option
         );
       if (!data) $this.data("collapse", (data = new Collapse(this, options)));
-      if (typeof option == "string") data[option]();
+      if (typeof option == "string" && typeof data[option] === "function") data[option]();
     });
   };
 
@@ -648,9 +710,10 @@
           $this.attr("data-target") ||
           e.preventDefault() ||
           ((href = $this.attr("href")) && href.replace(/.*(?=#[^\s]+$)/, "")), //strip for ie7
-        option = $(target).data("collapse") ? "toggle" : $this.data();
-      $this[$(target).hasClass("in") ? "addClass" : "removeClass"]("collapsed");
-      $(target).collapse(option);
+        sanitizedTarget = target && target.replace(/[^\w-]/g, ""),
+        option = $(sanitizedTarget).data("collapse") ? "toggle" : $this.data();
+      $this[$(sanitizedTarget).hasClass("in") ? "addClass" : "removeClass"]("collapsed");
+      $(sanitizedTarget).collapse(option);
     }
   );
 })(window.jQuery);
@@ -679,13 +742,77 @@
   /* DROPDOWN CLASS DEFINITION
    * ========================= */
 
-  var toggle = "[data-toggle=dropdown]",
-    Dropdown = function (element) {
+  var toggle = "[data-toggle=dropdown]";
+
+  class Dropdown {
+    constructor(element) {
       var $el = $(element).on("click.dropdown.data-api", this.toggle);
       $("html").on("click.dropdown.data-api", function () {
         $el.parent().removeClass("open");
       });
-    };
+    }
+
+    toggle(e) {
+      var $this = $(this),
+        $parent,
+        isActive;
+
+      if ($this.is(".disabled, :disabled")) return;
+
+      $parent = getParent($this);
+
+      isActive = $parent.hasClass("open");
+
+      clearMenus();
+
+      if (!isActive) {
+        if ("ontouchstart" in document.documentElement) {
+          $('<div class="dropdown-backdrop"/>')
+            .insertBefore($(this))
+            .on("click", clearMenus);
+        }
+        $parent.toggleClass("open");
+      }
+
+      $this.focus();
+
+      return false;
+    }
+
+    keydown(e) {
+      var $this, $items, $active, $parent, isActive, index;
+
+      if (!/(38|40|27)/.test(e.keyCode)) return;
+
+      $this = $(this);
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      if ($this.is(".disabled, :disabled")) return;
+
+      $parent = getParent($this);
+
+      isActive = $parent.hasClass("open");
+
+      if (!isActive || (isActive && e.keyCode == 27)) {
+        if (e.which == 27) $parent.find(toggle).focus();
+        return $this.click();
+      }
+
+      $items = $("[role=menu] li:not(.divider):visible a", $parent);
+
+      if (!$items.length) return;
+
+      index = $items.index($items.filter(":focus"));
+
+      if (e.keyCode == 38 && index > 0) index--; // up
+      if (e.keyCode == 40 && index < $items.length - 1) index++; // down
+      if (!~index) index = 0;
+
+      $items.eq(index).focus();
+    }
+  }
 
   Dropdown.prototype = {
     constructor: Dropdown,
@@ -772,7 +899,8 @@
         selector.replace(/.*(?=#[^\s]*$)/, ""); //strip for ie7
     }
 
-    $parent = selector && $(selector);
+    var sanitizedSelector = selector && selector.replace(/[^\w-]/g, '');
+    $parent = sanitizedSelector && $(sanitizedSelector);
 
     if (!$parent || !$parent.length) $parent = $this.parent();
 
@@ -843,16 +971,31 @@
   /* MODAL CLASS DEFINITION
    * ====================== */
 
-  var Modal = function (element, options) {
-    this.options = options;
-    this.$element = $(element).delegate(
-      '[data-dismiss="modal"]',
-      "click.dismiss.modal",
-      $.proxy(this.hide, this)
-    );
-    this.options.remote &&
-      this.$element.find(".modal-body").load(this.options.remote);
-  };
+  class Modal {
+    constructor(element, options) {
+      this.options = options;
+      this.$element = $(sanitizeSelector(element)).delegate(
+        '[data-dismiss="modal"]',
+        "click.dismiss.modal",
+        $.proxy(this.hide, this)
+      );
+      this.options.remote &&
+        this.$element.find(".modal-body").load(this.options.remote);
+    }
+  }
+
+  function sanitizeSelector(selector) {
+    return selector.replace(/[^\w-]/g, '');
+  }
+
+ 
+  function ScrollSpy(element, options) {
+    var process = $.proxy(this.process, this),
+      sanitizedElement = sanitizeSelector(element),
+      $element = $(sanitizedElement).is("body") ? $(window) : $(sanitizedElement),
+      href;
+    this.options = $.extend({}, $.fn.scrollspy.defaults, options);
+  }
 
   Modal.prototype = {
     constructor: Modal,
@@ -1026,7 +1169,7 @@
           typeof option == "object" && option
         );
       if (!data) $this.data("modal", (data = new Modal(this, options)));
-      if (typeof option == "string") data[option]();
+      if (typeof option == "string" && typeof data[option] === "function") data[option]();
       else if (options.show) data.show();
     });
   };
@@ -1053,14 +1196,14 @@
   $(document).on("click.modal.data-api", '[data-toggle="modal"]', function (e) {
     var $this = $(this),
       href = $this.attr("href"),
-      $target = $(
-        $this.attr("data-target") ||
-          (href && href.replace(/.*(?=#[^\s]+$)/, ""))
-      ), //strip for ie7
+      sanitizedHref = href && href.replace(/.*(?=#[^\s]+$)/, "").replace(/[^\w-]/g, ''),
+      dataTarget = $this.attr("data-target"),
+      sanitizedDataTarget = dataTarget && dataTarget.replace(/[^\w-]/g, ''),
+      $target = $(sanitizedDataTarget || sanitizedHref), //strip for ie7 and sanitize
       option = $target.data("modal")
         ? "toggle"
         : $.extend(
-            { remote: !/#/.test(href) && href },
+            { remote: !/#/.test(href) && sanitizedHref },
             $target.data(),
             $this.data()
           );
@@ -1109,9 +1252,13 @@
       var eventIn, eventOut, triggers, trigger, i;
 
       this.type = type;
-      this.$element = $(element);
+      this.$element = $(sanitizeSelector(element));
       this.options = this.getOptions(options);
       this.enabled = true;
+
+      function sanitizeSelector(selector) {
+        return selector.replace(/[^\w-]/g, '');
+      }
 
       triggers = this.options.trigger.split(" ");
 
@@ -1179,6 +1326,10 @@
           this
         );
 
+      var validTypes = ['tooltip', 'popover'];
+      if (!validTypes.includes(this.type)) {
+        throw new Error('Invalid type value');
+      }
       self = $(e.currentTarget)[this.type](options).data(this.type);
 
       if (!self.options.delay || !self.options.delay.show) return self.show();
@@ -1191,6 +1342,10 @@
     },
 
     leave: function (e) {
+      var validTypes = ['tooltip', 'popover'];
+      if (!validTypes.includes(this.type)) {
+        throw new Error('Invalid type value');
+      }
       var self = $(e.currentTarget)[this.type](this._options).data(this.type);
 
       if (this.timeout) clearTimeout(this.timeout);
@@ -1424,6 +1579,10 @@
     },
 
     toggle: function (e) {
+      var validTypes = ['tooltip', 'popover'];
+      if (!validTypes.includes(this.type)) {
+        throw new Error('Invalid type value');
+      }
       var self = e
         ? $(e.currentTarget)[this.type](this._options).data(this.type)
         : this;
@@ -1564,7 +1723,7 @@
         data = $this.data("popover"),
         options = typeof option == "object" && option;
       if (!data) $this.data("popover", (data = new Popover(this, options)));
-      if (typeof option == "string") data[option]();
+      if (typeof option == "string" && typeof data[option] === "function") data[option]();
     });
   };
 
@@ -1602,29 +1761,39 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License.
- * ============================================================== */
-
-!(function ($) {
-  "use strict"; // jshint ;_;
+  class ScrollSpy {
+    constructor(element, options) {
+      var process = $.proxy(this.process, this),
+        sanitizedElement = sanitizeSelector(element),
+        $element = $(sanitizedElement).is("body") ? $(window) : $(sanitizedElement),
+        href;
+      this.options = $.extend({}, $.fn.scrollspy.defaults, options);
+    }
 
   /* SCROLLSPY CLASS DEFINITION
    * ========================== */
 
-  function ScrollSpy(element, options) {
-    var process = $.proxy(this.process, this),
-      $element = $(element).is("body") ? $(window) : $(element),
-      href;
-    this.options = $.extend({}, $.fn.scrollspy.defaults, options);
-    this.$scrollElement = $element.on("scroll.scroll-spy.data-api", process);
-    this.selector =
-      (this.options.target ||
-        ((href = $(element).attr("href")) &&
-          href.replace(/.*(?=#[^\s]+$)/, "")) || //strip for ie7
-        "") + " .nav li > a";
-    this.$body = $("body");
-    this.refresh();
-    this.process();
+  class ScrollSpy {
+    constructor(element, options) {
+      var process = $.proxy(this.process, this),
+        sanitizedElement = sanitizeSelector(element),
+        $element = $(sanitizedElement).is("body") ? $(window) : $(sanitizedElement),
+        href;
+      this.options = $.extend({}, $.fn.scrollspy.defaults, options);
+      this.$scrollElement = $element.on("scroll.scroll-spy.data-api", process);
+      this.selector =
+        (this.options.target ||
+          ((href = $(sanitizedElement).attr("href")) &&
+            href.replace(/.*(?=#[^\s]+$)/, "").replace(/[^\w-]/g, "")) || //strip for ie7 and sanitize
+          "") + " .nav li > a";
+      this.$body = $("body");
+      this.refresh();
+      this.process();
+    }
+  }
+
+  function sanitizeSelector(selector) {
+    return selector.replace(/[^\w-]/g, '');
   }
 
   ScrollSpy.prototype = {
@@ -1694,14 +1863,15 @@
 
       $(this.selector).parent(".active").removeClass("active");
 
+      var sanitizedTarget = target.replace(/[^\w-]/g, '');
       selector =
         this.selector +
         '[data-target="' +
-        target +
+        sanitizedTarget +
         '"],' +
         this.selector +
         '[href="' +
-        target +
+        sanitizedTarget +
         '"]';
 
       active = $(selector).parent("li").addClass("active");
@@ -1725,7 +1895,7 @@
         data = $this.data("scrollspy"),
         options = typeof option == "object" && option;
       if (!data) $this.data("scrollspy", (data = new ScrollSpy(this, options)));
-      if (typeof option == "string") data[option]();
+      if (typeof option == "string" && typeof data[option] === "function") data[option]();
     });
   };
 
@@ -1778,9 +1948,15 @@
   /* TAB CLASS DEFINITION
    * ==================== */
 
-  var Tab = function (element) {
-    this.element = $(element);
-  };
+  class Tab {
+    constructor(element) {
+      this.element = $(sanitizeSelector(element));
+    }
+  }
+
+  function sanitizeSelector(selector) {
+    return selector.replace(/[^\w-]/g, '');
+  }
 
   Tab.prototype = {
     constructor: Tab,
@@ -1915,18 +2091,24 @@
   /* TYPEAHEAD PUBLIC CLASS DEFINITION
    * ================================= */
 
-  var Typeahead = function (element, options) {
-    this.$element = $(element);
-    this.options = $.extend({}, $.fn.typeahead.defaults, options);
-    this.matcher = this.options.matcher || this.matcher;
-    this.sorter = this.options.sorter || this.sorter;
-    this.highlighter = this.options.highlighter || this.highlighter;
-    this.updater = this.options.updater || this.updater;
-    this.source = this.options.source;
-    this.$menu = $(this.options.menu);
-    this.shown = false;
-    this.listen();
-  };
+  class Typeahead {
+    constructor(element, options) {
+      this.$element = $(sanitizeSelector(element));
+      this.options = $.extend({}, $.fn.typeahead.defaults, options);
+      this.matcher = this.options.matcher || this.matcher;
+      this.sorter = this.options.sorter || this.sorter;
+      this.highlighter = this.options.highlighter || this.highlighter;
+      this.updater = this.options.updater || this.updater;
+      this.source = this.options.source;
+      this.$menu = $(this.options.menu);
+      this.shown = false;
+      this.listen();
+    }
+  }
+
+  function sanitizeSelector(selector) {
+    return selector.replace(/[^\w-]/g, '');
+  }
 
   Typeahead.prototype = {
     constructor: Typeahead,
@@ -2031,12 +2213,12 @@
 
       items = $(items).map(function (i, item) {
         i = $(that.options.item).attr("data-value", item);
-        i.find("a").html(that.highlighter(item));
+        i.find("a").text(that.highlighter(item));
         return i[0];
       });
 
       items.first().addClass("active");
-      this.$menu.html(items);
+      HtmlUtils.setHtml(this.$menu, items);
       return this;
     },
 
@@ -2045,7 +2227,8 @@
         next = active.next();
 
       if (!next.length) {
-        next = $(this.$menu.find("li")[0]);
+        var sanitizedSelector = this.$menu.find("li").first();
+        next = $(sanitizedSelector);
       }
 
       next.addClass("active");
@@ -2169,7 +2352,8 @@
     mouseenter: function (e) {
       this.mousedover = true;
       this.$menu.find(".active").removeClass("active");
-      $(e.currentTarget).addClass("active");
+      var sanitizedTarget = e.currentTarget.replace(/[^\w-]/g, '');
+      $(sanitizedTarget).addClass("active");
     },
 
     mouseleave: function (e) {
@@ -2189,7 +2373,7 @@
         data = $this.data("typeahead"),
         options = typeof option == "object" && option;
       if (!data) $this.data("typeahead", (data = new Typeahead(this, options)));
-      if (typeof option == "string") data[option]();
+      if (typeof option == "string" && typeof data[option] === "function") data[option]();
     });
   };
 
@@ -2249,19 +2433,25 @@
   /* AFFIX CLASS DEFINITION
    * ====================== */
 
-  var Affix = function (element, options) {
-    this.options = $.extend({}, $.fn.affix.defaults, options);
-    this.$window = $(window)
-      .on("scroll.affix.data-api", $.proxy(this.checkPosition, this))
-      .on(
-        "click.affix.data-api",
-        $.proxy(function () {
-          setTimeout($.proxy(this.checkPosition, this), 1);
-        }, this)
-      );
-    this.$element = $(element);
-    this.checkPosition();
-  };
+  class Affix {
+    constructor(element, options) {
+      this.options = $.extend({}, $.fn.affix.defaults, options);
+      this.$window = $(window)
+        .on("scroll.affix.data-api", $.proxy(this.checkPosition, this))
+        .on(
+          "click.affix.data-api",
+          $.proxy(function () {
+            setTimeout($.proxy(this.checkPosition, this), 1);
+          }, this)
+        );
+      this.$element = $(sanitizeSelector(element));
+      this.checkPosition();
+    }
+  }
+
+  function sanitizeSelector(selector) {
+    return selector.replace(/[^\w-]/g, '');
+  }
 
   Affix.prototype.checkPosition = function () {
     if (!this.$element.is(":visible")) return;
@@ -2310,7 +2500,7 @@
         data = $this.data("affix"),
         options = typeof option == "object" && option;
       if (!data) $this.data("affix", (data = new Affix(this, options)));
-      if (typeof option == "string") data[option]();
+      if (typeof option == "string" && typeof data[option] === "function") data[option]();
     });
   };
 

@@ -3821,9 +3821,9 @@ class Tooltip extends BaseComponent {
       return this.tip;
     }
 
-    const element = document.createElement('div');
-    element.innerHTML = this._config.template;
-    this.tip = element.children[0];
+    const template = document.createElement('div');
+    template.textContent = this._config.template.trim();
+    this.tip = template.firstChild;
     return this.tip;
   }
 
@@ -3858,7 +3858,7 @@ class Tooltip extends BaseComponent {
         content = sanitizeHtml(content, this._config.allowList, this._config.sanitizeFn);
       }
 
-      element.innerHTML = content;
+      element.innerHTML = sanitizeHtml(content, this._config.allowList, this._config.sanitizeFn);
     } else {
       element.textContent = content;
     }

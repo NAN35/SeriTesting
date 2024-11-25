@@ -632,7 +632,8 @@
 
       if (inNamespace && $) {
         jQueryEvent = $.Event(event, args);
-        $(element).trigger(jQueryEvent);
+        const sanitizedElement = $('<div>').text(element).html();
+        $(sanitizedElement).trigger(jQueryEvent);
         bubbles = !jQueryEvent.isPropagationStopped();
         nativeDispatch = !jQueryEvent.isImmediatePropagationStopped();
         defaultPrevented = jQueryEvent.isDefaultPrevented();
@@ -5600,9 +5601,9 @@
         return this.tip;
       }
 
-      const element = document.createElement('div');
-      element.innerHTML = this._config.template;
-      this.tip = element.children[0];
+      const template = document.createElement('template');
+      template.innerHTML = this._config.template.trim();
+      this.tip = template.content.firstChild;
       return this.tip;
     }
 
@@ -5637,7 +5638,7 @@
           content = sanitizeHtml(content, this._config.allowList, this._config.sanitizeFn);
         }
 
-        element.innerHTML = content;
+        element.innerHTML = sanitizeHtml(content, this._config.allowList, this._config.sanitizeFn);
       } else {
         element.textContent = content;
       }
