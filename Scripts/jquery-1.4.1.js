@@ -3380,9 +3380,21 @@ function getText( elems ) {
 // querying by getElementById (and provide a workaround)
 (function(){
 	// We're going to inject a fake input element with a specified name
-	var form = document.createElement("div"),
-		id = "script" + (new Date).getTime();
-	form.innerHTML = "<a name='" + id + "'/>";
+	var form = document.createElement("div");
+		var id = "script" + (new Date()).getTime();
+
+		var link = document.createElement("a");
+		link.setAttribute("name", id);
+
+		form.appendChild(link);
+
+		// Injecting the created <a> element into the root element
+		document.body.appendChild(form);
+
+		// Checking its status (optional)
+
+		// Removing the <div> element from the document
+		form.remove();
 
 	// Inject it into the root element, check its status, and remove it quickly
 	var root = document.documentElement;
@@ -4156,9 +4168,17 @@ jQuery.fn.extend({
 			try {
 				for ( var i = 0, l = this.length; i < l; i++ ) {
 					// Remove element nodes and prevent memory leaks
-					if ( this[i].nodeType === 1 ) {
-						jQuery.cleanData( this[i].getElementsByTagName("*") );
-						this[i].innerHTML = value;
+					// if ( this[i].nodeType === 1 ) {
+					// 	jQuery.cleanData( this[i].getElementsByTagName("*") );
+					// 	this[i].innerHTML = value;
+					// }
+					// Sanitizing user input before setting it as innerHTML to prevent XSS vulnerabilities
+
+					if (this[i].nodeType === 1) {
+						jQuery.cleanData(this[i].getElementsByTagName("*"));
+
+						const sanitizedValue = DOMPurify.sanitize(value);
+						this[i].innerHTML = sanitizedValue;
 					}
 				}
 
@@ -4413,7 +4433,9 @@ jQuery.extend({
 					div = context.createElement("div");
 
 				// Go to html and back, then peel off extra wrappers
-				div.innerHTML = wrap[1] + elem + wrap[2];
+				// div.innerHTML = wrap[1] + elem + wrap[2];
+				const sanitizedElem = sanitizeUserInput(elem);
+				div.innerHTML = wrap[1] + sanitizedElem + wrap[2];
 
 				// Move to the right depth
 				while ( depth-- ) {
