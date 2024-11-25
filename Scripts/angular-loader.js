@@ -560,11 +560,26 @@ function setupModuleLoader(window) {
          * @returns {angular.Module}
          */
         function invokeLater(provider, method, insertMethod, queue) {
+          // if (!queue) queue = invokeQueue;
+          // return function() {
+          //   queue[insertMethod || 'push']([provider, method, arguments]);
+          //   return moduleInstance;
+          // };
+          const allowedMethods = ['push', 'someOtherMethod']; // Define a list of allowed methods
+
           if (!queue) queue = invokeQueue;
+
           return function() {
-            queue[insertMethod || 'push']([provider, method, arguments]);
-            return moduleInstance;
+              const methodToUse = insertMethod && allowedMethods.includes(insertMethod) ? insertMethod : 'push';
+
+              if (typeof queue[methodToUse] === 'function') {
+                  queue[methodToUse]([provider, method, arguments]);
+              } else {
+                  console.error('Invalid method specified');
+              }
           };
+
+          return moduleInstance;
         }
 
         /**

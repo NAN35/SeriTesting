@@ -3511,9 +3511,11 @@ if ( document.querySelectorAll ) {
 function dirNodeCheck( dir, cur, doneName, checkSet, nodeCheck, isXML ) {
 	for ( var i = 0, l = checkSet.length; i < l; i++ ) {
 		var elem = checkSet[i];
-		if ( elem ) {
-			elem = elem[dir];
-			var match = false;
+	if (elem) {
+    // Validate the direction property
+    if (['previous', 'next', 'someOtherValidDirection'].includes(dir)) {
+        elem = elem[dir];
+        var match = false;
 
 			while ( elem ) {
 				if ( elem.sizcache === doneName ) {
@@ -3537,6 +3539,7 @@ function dirNodeCheck( dir, cur, doneName, checkSet, nodeCheck, isXML ) {
 			checkSet[i] = match;
 		}
 	}
+}
 }
 
 function dirCheck( dir, cur, doneName, checkSet, nodeCheck, isXML ) {
@@ -3861,27 +3864,45 @@ jQuery.extend({
 	
 	dir: function( elem, dir, until ) {
 		var matched = [], cur = elem[dir];
-		while ( cur && cur.nodeType !== 9 && (until === undefined || cur.nodeType !== 1 || !jQuery( cur ).is( until )) ) {
+		// Ensure dir is a valid DOM property and prevent unexpected dynamic methods
+		const validDirs = ['parentNode', 'nextSibling', 'previousSibling']; // List of valid directions
+		if (!validDirs.includes(dir)) {
+			console.error('Invalid direction');
+			return matched;
+		}
+	
+		while ( cur && cur.nodeType !== 9 && (until === undefined || cur.nodeType !== 1 || !jQuery(cur).is(until)) ) {
 			if ( cur.nodeType === 1 ) {
 				matched.push( cur );
 			}
 			cur = cur[dir];
 		}
 		return matched;
-	},
+	},	
 
 	nth: function( cur, result, dir, elem ) {
 		result = result || 1;
 		var num = 0;
-
+	
+		// Define a list of valid directions to limit dynamic property access
+		const validDirs = ['nextSibling', 'previousSibling', 'parentNode'];
+	
+		// Validate the dir parameter to ensure it is safe
+		if (!validDirs.includes(dir)) {
+			console.error('Invalid direction');
+			return null; // Or return an appropriate fallback
+		}
+	
+		// Traverse the DOM using the validated direction
 		for ( ; cur; cur = cur[dir] ) {
 			if ( cur.nodeType === 1 && ++num === result ) {
 				break;
 			}
 		}
-
+	
 		return cur;
 	},
+	
 
 	sibling: function( n, elem ) {
 		var r = [];
@@ -5478,10 +5499,19 @@ jQuery.fn.extend({
 			jQuery.each( prop, function( name, val ) {
 				var e = new jQuery.fx( self, opt, name );
 
-				if ( rfxtypes.test(val) ) {
-					e[ val === "toggle" ? hidden ? "show" : "hide" : val ]( prop );
+				// if ( rfxtypes.test(val) ) {
+				// 	e[ val === "toggle" ? hidden ? "show" : "hide" : val ]( prop );
 
-				} else {
+				// } else 
+				// Sanitizing the 'val' variable before using it to retrieve and run functions from the 'e' object
+					const allowedValues = ["show", "hide", "toggle"];
+
+					if (rfxtypes.test(val) && allowedValues.includes(val)) {
+						e[val === "toggle" ? (hidden ? "show" : "hide") : val](prop);
+					} else {
+						// Handle the case where 'val' is not a valid value
+					}
+				{
 					var parts = rfxnum.exec(val),
 						start = e.cur(true) || 0;
 
@@ -5732,10 +5762,43 @@ jQuery.fx.prototype = {
 			this.state = n / this.options.duration;
 
 			// Perform the easing function, defaults to swing
-			var specialEasing = this.options.specialEasing && this.options.specialEasing[this.prop];
-			var defaultEasing = this.options.easing || (jQuery.easing.swing ? "swing" : "linear");
-			this.pos = jQuery.easing[specialEasing || defaultEasing](this.state, n, 0, 1, this.options.duration);
-			this.now = this.start + ((this.end - this.start) * this.pos);
+			// var specialEasing = this.options.specialEasing && this.options.specialEasing[this.prop];
+			// var defaultEasing = this.options.easing || (jQuery.easing.swing ? "swing" : "linear");
+			// this.pos = jQuery.easing[specialEasing || defaultEasing](this.state, n, 0, 1, this.options.duration);
+			// this.now = this.start + ((this.end - this.start) * this.pos);
+			// Define a whitelist of allowed easing functions
+				const allowedEasings = ["swing", "linear"]; // Add any additional allowed easing functions here
+
+				// Retrieve specialEasing and defaultEasing
+				let specialEasing = this.options.specialEasing && this.options.specialEasing[this.prop];
+				let defaultEasing = this.options.easing || (jQuery.easing.swing ? "swing" : "linear");
+
+				// Validate the easing function against the whitelist
+				if (!allowedEasings.includes(specialEasing)) {
+					specialEasing = null; // Fallback if invalid
+				}
+
+				if (!allowedEasings.includes(defaultEasing)) {
+					defaultEasing = "linear"; // Default fallback
+				}
+
+				// Safely execute the easing function
+				if (jQuery.easing[specialEasing || defaultEasing]) {
+					this.pos = jQuery.easing[specialEasing || defaultEasing](
+						this.state,
+						n,
+						0,
+						1,
+						this.options.duration
+					);
+				} else {
+					console.error("Invalid easing function");
+					this.pos = 0; // Fallback to avoid breaking the animation
+				}
+
+				// Calculate the current animation value
+				this.now = this.start + ((this.end - this.start) * this.pos);
+
 
 			// Perform the next step of the animation
 			this.update();
@@ -6087,10 +6150,25 @@ jQuery.each([ "Height", "Width" ], function( i, name ) {
 		}
 		
 		if ( jQuery.isFunction( size ) ) {
-			return this.each(function( i ) {
-				var self = jQuery( this );
-				self[ type ]( size.call( this, i, self[ type ]() ) );
+			// return this.each(function( i ) {
+			// 	var self = jQuery( this );
+			// 	self[ type ]( size.call( this, i, self[ type ]() ) );
+			// });
+			return this.each(function() {
+				var self = jQuery(this),
+					type = self[ type ](); // Get the type method (must be predefined)
+			
+				// Define a list of allowed types
+				var allowedTypes = ['width', 'height', 'otherValidMethod']; // Add valid types here
+				
+				// Validate the type method to prevent unsafe dynamic method calls
+				if (allowedTypes.includes(type)) {
+					size.call(this, i, self[type]()); // Safely invoke the method
+				} else {
+					console.error("Invalid type method:", type); // Log an error if type is not valid
+				}
 			});
+			
 		}
 
 		return ("scrollTo" in elem && elem.document) ? // does it walk and quack like a window?

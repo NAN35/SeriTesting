@@ -810,7 +810,7 @@ MessageFormatParser.prototype.ruleInAngularExpression = function ruleInAngularEx
       // todo: does this need to be trimmed?
       this.expressionFn = this.$parse(this.text.substring(this.expressionStartIndex, match.index));
       // Needed to pretend to be $interpolate for tests copied from interpolateSpec.js
-      this.expressionFn['exp'] = this.text.substring(this.expressionStartIndex, match.index);
+      // this.expressionFn['exp'] = this.text.substring(this.expressionStartIndex, match.index);
       this.expressionFn['expressions'] = this.expressionFn['expressions'];
       this.rule = null;
       this.rule = this.rulePluralOrSelect;
