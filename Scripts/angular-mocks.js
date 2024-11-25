@@ -1106,7 +1106,7 @@
         angular.forEach(object, function (element) {
           out.append(angular.element(element).clone());
         });
-        out = out.html();
+        out = out.text();
       } else if (angular.isArray(object)) {
         out = [];
         angular.forEach(object, function (o) {

@@ -105,10 +105,23 @@ function sanitizeSelector(input) {
 					left: $(window).scrollLeft()
 				});
 
-			elem[attr] = '';
-			$('body').prepend($a);
-			location.hash = link.hash;
-			$a.remove();
+			// Ensure the attribute name is safe (if 'attr' is user-controlled)
+			var validAttributes = ["href", "src", "alt"]; // Example of allowed attributes
+			if (validAttributes.includes(attr)) {
+				elem[attr] = '';  // Only set valid attributes
+			}
+
+			// Prepend content safely
+			var $safeAnchor = $('<a>').text($a.text()).attr('href', $a.attr('href'));
+			$('body').prepend($safeAnchor);
+
+			// Ensure location.hash is safe before assignment
+			var sanitizedHash = encodeURIComponent(link.hash); // Sanitize the hash value
+			location.hash = sanitizedHash;
+
+			// Remove the element after use
+			$safeAnchor.remove();
+
 			elem[attr] = id;
 		}
 

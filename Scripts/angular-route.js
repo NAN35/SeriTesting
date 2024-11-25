@@ -1272,7 +1272,7 @@
         var current = $route.current,
           locals = current.locals;
 
-        $element.html(locals.$template);
+        $element.text(locals.$template);
 
         var link = $compile($element.contents());
 

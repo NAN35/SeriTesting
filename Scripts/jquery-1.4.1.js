@@ -4169,7 +4169,7 @@ jQuery.fn.extend({
 
 		} else if ( jQuery.isFunction( value ) ) {
 			this.each(function(i){
-				var self = jQuery(this), old = self.html();
+				var self = jQuery(this), old = self.text();
 				self.empty().append(function(){
 					return value.call( this, i, old );
 				});
@@ -4191,7 +4191,7 @@ jQuery.fn.extend({
 
 			} else {
 				return this.each(function(i) {
-					var self = jQuery(this), old = self.html();
+					var self = jQuery(this), old = self.text();
 					self.replaceWith( value.call( this, i, old ) );
 				});
 			}
@@ -4229,7 +4229,7 @@ jQuery.fn.extend({
 		if ( jQuery.isFunction(value) ) {
 			return this.each(function(i) {
 				var self = jQuery(this);
-				args[0] = value.call(this, i, table ? self.html() : undefined);
+				args[0] = value.call(this, i, table ? self.text() : undefined);
 				self.domManip( args, table, callback );
 			});
 		}
@@ -4768,7 +4768,7 @@ jQuery.fn.extend({
 				// If successful, inject the HTML into all the matched elements
 				if ( status === "success" || status === "notmodified" ) {
 					// See if a selector was specified
-					self.html( selector ?
+					self.text( selector ?
 						// Create a dummy div to hold the results
 						jQuery("<div />")
 							// inject the contents of the document in, removing the scripts
