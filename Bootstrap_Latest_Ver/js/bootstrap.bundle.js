@@ -1926,7 +1926,13 @@
           throw new TypeError(`No method named "${config}"`);
         }
 
-        data[config]();
+        // data[config]();
+
+        if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
+          data[config]();
+        } else {
+          console.log('Config key not found or not a function');
+        }
       }
     }
 
@@ -4081,7 +4087,12 @@
           throw new TypeError(`No method named "${config}"`);
         }
 
-        data[config]();
+        // data[config]();
+        if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
+          data[config]();
+        } else {
+          console.log('Config key not found or not a function');
+        }
       }
     }
 
@@ -4835,7 +4846,10 @@
           throw new TypeError(`No method named "${config}"`);
         }
 
-        data[config](relatedTarget);
+        // data[config](relatedTarget);
+        if (typeof data[config] === 'function') {
+          data[config](relatedTarget);
+      }
       });
     }
 
@@ -5088,7 +5102,11 @@
           throw new TypeError(`No method named "${config}"`);
         }
 
-        data[config](this);
+        // data[config](this);
+
+        if (typeof config === 'string' && typeof data[config] === 'function') {
+          data[config](this);
+        }
       });
     }
 
@@ -5921,7 +5939,12 @@
             throw new TypeError(`No method named "${config}"`);
           }
 
-          data[config]();
+          // data[config]();
+          if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
+            data[config]();
+          } else {
+            console.log('Config key not found or not a function');
+          }
         }
       });
     }
@@ -6070,7 +6093,12 @@
             throw new TypeError(`No method named "${config}"`);
           }
 
-          data[config]();
+          // data[config]();
+          if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
+            data[config]();
+          } else {
+            console.log('Config key not found or not a function');
+          }
         }
       });
     }
@@ -6313,7 +6341,12 @@
           throw new TypeError(`No method named "${config}"`);
         }
 
-        data[config]();
+        // data[config]();
+        if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
+          data[config]();
+        } else {
+          console.log('Config key not found or not a function');
+        }
       });
     }
 
@@ -6501,7 +6534,12 @@
             throw new TypeError(`No method named "${config}"`);
           }
 
-          data[config]();
+          // data[config]();
+          if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
+            data[config]();
+          } else {
+            console.log('Config key not found or not a function');
+          }
         }
       });
     }
