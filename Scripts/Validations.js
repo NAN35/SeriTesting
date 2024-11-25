@@ -1,27 +1,38 @@
-﻿function isAlpha(e)
-        {
-        var key;       
-        if(window.event) 
-        { 
-         key = window.event.keyCode;  
-        } 
-        else 
-        { 
-          key = e.which;       
-        } 
-        if (!((key >64 && key <=90) || (key >96 && key <=122) || (key==32)|| (key==46))) 
-        { 
-          alert("Please Enter Only the Alphabets");
-          return false; 
-        } 
-        }
+﻿function isAlpha(e) {
+    var key;       
+    if (window.event) { 
+        key = window.event.keyCode;  
+    } else { 
+        key = e.which;       
+    }
+
+    if (!((key > 64 && key <= 90) || (key > 96 && key <= 122) || (key == 32) || (key == 46))) { 
+        showErrorMessage("Please Enter Only the Alphabets");
+        return false; 
+    }
+}
+
+function showErrorMessage(message) {
+    // Here, you could display a modal or use a toast notification.
+    // For example, using a simple div for error message display:
+    var errorDiv = document.createElement('div');
+    errorDiv.classList.add('error-message');
+    errorDiv.innerText = message;
+    document.body.appendChild(errorDiv);
+
+    // Optionally, auto-remove after 5 seconds
+    setTimeout(function() {
+        document.body.removeChild(errorDiv);
+    }, 5000);
+}
+
      
             function isNumberKey(evt)
             {
              var charCode = (evt.which) ? evt.which : event.keyCode
              if (charCode > 31 && (charCode < 48 || charCode > 57) )
              {  
-                alert("Please enter only numbers");
+                showErrorMessage("Please enter only numbers");
                 return false;
               }
              return true;
@@ -33,7 +44,7 @@
           
              if (charCode > 31 && (charCode <= 44 || charCode > 57 || charCode==46 || charCode==47))
              {  
-                alert("Please enter only numbers");
+                showErrorMessage("Please enter only numbers");
                 return false;
               }
              return true;
@@ -90,21 +101,43 @@
         }
     }
 
-    function isunder300(txtbox) {
-        var maxvalue = 300
-        if (txtbox.value > maxvalue) {
-            alert("Marks should be less than or equal to 300");
-            txtbox.value = "";
-            txtbox.focus();
+    function showErrorMessage(message, element) {
+        // Create an inline error message or use a notification library
+        const errorContainer = document.createElement('div');
+        errorContainer.className = 'error-message'; // Add appropriate CSS for styling
+        errorContainer.innerText = message;
+    
+        // Append the error message next to the textbox
+        const parent = element.parentNode;
+        if (!parent.querySelector('.error-message')) {
+            parent.appendChild(errorContainer);
+        }
+    
+        // Clear the error message after 3 seconds
+        setTimeout(() => {
+            if (errorContainer.parentNode) {
+                errorContainer.parentNode.removeChild(errorContainer);
+            }
+        }, 3000);
+    
+        element.value = ""; // Reset the value
+        element.focus(); // Refocus the element
+    }
+    
+    function isUnderLimit(txtbox, maxValue) {
+        if (parseInt(txtbox.value, 10) > maxValue) {
+            const message = `Marks should be less than or equal to ${maxValue}`;
+            showErrorMessage(message, txtbox);
         }
     }
-
-    function isunder200(txtbox) {
-        var maxvalue = 200
-        if (txtbox.value > maxvalue) {
-            alert("Marks should be less than or equal to 200");
-            txtbox.value = "";
-            txtbox.focus();
-        }
+    
+    // Usage examples:
+    function isUnder300(txtbox) {
+        isUnderLimit(txtbox, 300);
     }
+    
+    function isUnder200(txtbox) {
+        isUnderLimit(txtbox, 200);
+    }
+    
            

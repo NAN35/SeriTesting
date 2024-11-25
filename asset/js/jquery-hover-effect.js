@@ -3,13 +3,26 @@
 	/*
 	 * HoverDir object.
 	 */
-	$.HoverDir 				= function( options, element ) {
+	// $.HoverDir 				= function( options, element ) {
 	
-		this.$el	= $( element );
+	// 	this.$el	= $( element );
 		
-		this._init( options );
+	// 	this._init( options );
 		
-	};
+	// };
+	var userInput = $('#userInput').val(); // User-controlled input
+	$(userInput).css('color', 'red');      // Directly using input in the selector
+
+	// Get user input
+var userInput = $('#userInput').val(); 
+
+// Sanitize input using $.escapeSelector to prevent XSS
+var sanitizedInput = $.escapeSelector(userInput); 
+
+// Construct a safe selector and apply CSS changes
+$('#' + sanitizedInput).css('color', 'red'); 
+
+
 	
 	$.HoverDir.defaults 	= {
 		hoverDelay	: 0,

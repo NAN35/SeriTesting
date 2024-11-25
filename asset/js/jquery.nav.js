@@ -19,12 +19,15 @@
 
 ;(function($, window, document, undefined){
 
-	// our plugin constructor
-	var OnePageNav = function(elem, options){
+	var OnePageNav = function(elem, options) {
 		this.elem = elem;
 		this.$elem = $(elem);
 		this.options = options;
 		this.metadata = this.$elem.data('plugin-options');
+		
+		// Sanitize metadata if it's used in selectors later in the code
+		this.metadata = this.sanitizeMetadata(this.metadata);
+		
 		this.$nav = this.$elem.find('a');
 		this.$win = $(window);
 		this.sections = {};
@@ -32,6 +35,15 @@
 		this.$doc = $(document);
 		this.docHeight = this.$doc.height();
 	};
+	
+	// Helper function to sanitize the metadata or any other input
+	OnePageNav.prototype.sanitizeMetadata = function(metadata) {
+		if (metadata && typeof metadata === 'string') {
+			return $.escapeSelector(metadata);  // Sanitize if it's a string used in selectors
+		}
+		return metadata;
+	};
+	
 
 	// the plugin prototype
 	OnePageNav.prototype = {
@@ -116,9 +128,15 @@
 			
 			self.$nav.each(function() {
 				linkHref = self.getHash($(this));
-				topPos = $('#' + linkHref).offset().top;
+				
+				// Sanitize linkHref before using it in the selector
+				var sanitizedLinkHref = $.escapeSelector(linkHref);
+				
+				// Use the sanitized version in the selector
+				topPos = $('#' + sanitizedLinkHref).offset().top;
 			
 				self.sections[linkHref] = Math.round(topPos) - self.config.scrollOffset;
+			
 			});
 		},
 		
@@ -140,6 +158,17 @@
 			var $link = $(e.currentTarget);
 			var $parent = $link.parent();
 			var newLoc = '#' + self.getHash($link);
+			
+			// Sanitize the newLoc value to ensure it is safe for use in a selector
+			var sanitizedLoc = $.escapeSelector(newLoc);
+			
+			// Now safely use the sanitizedLoc in the selector
+			// Example of using sanitizedLoc in your code
+			$('html, body').animate({
+				scrollTop: $(sanitizedLoc).offset().top
+			}, 1000);
+
+		
 			
 			if(!$parent.hasClass(self.config.currentClass)) {
 				//Start callback

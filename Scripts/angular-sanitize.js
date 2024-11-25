@@ -379,7 +379,9 @@ function $SanitizeProvider() {
     }
 
     function getInertBodyElement_InertDocument(html) {
-      inertBodyElement.innerHTML = html;
+      const inertBodyElement = document.createElement('div');
+    inertBodyElement.innerHTML = html;
+
 
       // Support: IE 9-11 only
       // strip custom-namespaced attributes on IE<=11

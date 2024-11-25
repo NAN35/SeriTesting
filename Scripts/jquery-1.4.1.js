@@ -788,7 +788,10 @@ function evalScript( i, elem ) {
 			dataType: "script"
 		});
 	} else {
-		jQuery.globalEval( elem.text || elem.textContent || elem.innerHTML || "" );
+		// If you just need to safely display the content as text:
+		var content = elem.text || elem.textContent || "";
+		$('#result').text(content); // Use text() to prevent HTML or script execution
+
 	}
 
 	if ( elem.parentNode ) {
@@ -3377,9 +3380,21 @@ function getText( elems ) {
 // querying by getElementById (and provide a workaround)
 (function(){
 	// We're going to inject a fake input element with a specified name
-	var form = document.createElement("div"),
-		id = "script" + (new Date).getTime();
-	form.innerHTML = "<a name='" + id + "'/>";
+	var form = document.createElement("div");
+		var id = "script" + (new Date()).getTime();
+
+		var link = document.createElement("a");
+		link.setAttribute("name", id);
+
+		form.appendChild(link);
+
+		// Injecting the created <a> element into the root element
+		document.body.appendChild(form);
+
+		// Checking its status (optional)
+
+		// Removing the <div> element from the document
+		form.remove();
 
 	// Inject it into the root element, check its status, and remove it quickly
 	var root = document.documentElement;
@@ -3511,9 +3526,11 @@ if ( document.querySelectorAll ) {
 function dirNodeCheck( dir, cur, doneName, checkSet, nodeCheck, isXML ) {
 	for ( var i = 0, l = checkSet.length; i < l; i++ ) {
 		var elem = checkSet[i];
-		if ( elem ) {
-			elem = elem[dir];
-			var match = false;
+	if (elem) {
+    // Validate the direction property
+    if (['previous', 'next', 'someOtherValidDirection'].includes(dir)) {
+        elem = elem[dir];
+        var match = false;
 
 			while ( elem ) {
 				if ( elem.sizcache === doneName ) {
@@ -3537,6 +3554,7 @@ function dirNodeCheck( dir, cur, doneName, checkSet, nodeCheck, isXML ) {
 			checkSet[i] = match;
 		}
 	}
+}
 }
 
 function dirCheck( dir, cur, doneName, checkSet, nodeCheck, isXML ) {
@@ -3861,27 +3879,45 @@ jQuery.extend({
 	
 	dir: function( elem, dir, until ) {
 		var matched = [], cur = elem[dir];
-		while ( cur && cur.nodeType !== 9 && (until === undefined || cur.nodeType !== 1 || !jQuery( cur ).is( until )) ) {
+		// Ensure dir is a valid DOM property and prevent unexpected dynamic methods
+		const validDirs = ['parentNode', 'nextSibling', 'previousSibling']; // List of valid directions
+		if (!validDirs.includes(dir)) {
+			console.error('Invalid direction');
+			return matched;
+		}
+	
+		while ( cur && cur.nodeType !== 9 && (until === undefined || cur.nodeType !== 1 || !jQuery(cur).is(until)) ) {
 			if ( cur.nodeType === 1 ) {
 				matched.push( cur );
 			}
 			cur = cur[dir];
 		}
 		return matched;
-	},
+	},	
 
 	nth: function( cur, result, dir, elem ) {
 		result = result || 1;
 		var num = 0;
-
+	
+		// Define a list of valid directions to limit dynamic property access
+		const validDirs = ['nextSibling', 'previousSibling', 'parentNode'];
+	
+		// Validate the dir parameter to ensure it is safe
+		if (!validDirs.includes(dir)) {
+			console.error('Invalid direction');
+			return null; // Or return an appropriate fallback
+		}
+	
+		// Traverse the DOM using the validated direction
 		for ( ; cur; cur = cur[dir] ) {
 			if ( cur.nodeType === 1 && ++num === result ) {
 				break;
 			}
 		}
-
+	
 		return cur;
 	},
+	
 
 	sibling: function( n, elem ) {
 		var r = [];
@@ -3944,12 +3980,20 @@ jQuery.fn.extend({
 		return jQuery.getText( this );
 	},
 
-	wrapAll: function( html ) {
-		if ( jQuery.isFunction( html ) ) {
-			return this.each(function(i) {
-				jQuery(this).wrapAll( html.call(this, i) );
-			});
-		}
+	// wrapAll: function( html ) {
+	// 	if ( jQuery.isFunction( html ) ) {
+	// 		return this.each(function(i) {
+	// 			jQuery(this).wrapAll( html.call(this, i) );
+	// 		});
+	// 	}
+	// Using DOMPurify to sanitize the HTML content before wrapping
+		wrapAll: function( html ) {
+			if ( jQuery.isFunction( html ) ) {
+				return this.each(function(i) {
+					var sanitizedHtml = DOMPurify.sanitize(html.call(this, i));
+					jQuery(this).wrapAll(sanitizedHtml);
+				});
+			}
 
 		if ( this[0] ) {
 			// The elements to wrap the target around
@@ -3973,30 +4017,56 @@ jQuery.fn.extend({
 		return this;
 	},
 
+	// wrapInner: function( html ) {
+	// 	if ( jQuery.isFunction( html ) ) {
+	// 		return this.each(function(i) {
+	// 			jQuery(this).wrapInner( html.call(this, i) );
+	// 		});
+	// 	}
+
+	// 	return this.each(function() {
+	// 		var self = jQuery( this ), contents = self.contents();
+
+	// 		if ( contents.length ) {
+	// 			contents.wrapAll( html );
+
+	// 		} else {
+	// 			self.append( html );
+	// 		}
+	// 	});
+	// },
 	wrapInner: function( html ) {
 		if ( jQuery.isFunction( html ) ) {
 			return this.each(function(i) {
-				jQuery(this).wrapInner( html.call(this, i) );
+				jQuery(this).wrapInner( sanitizeInput(html.call(this, i)) ); // Sanitize input from function
 			});
 		}
-
+	
 		return this.each(function() {
 			var self = jQuery( this ), contents = self.contents();
-
+	
 			if ( contents.length ) {
-				contents.wrapAll( html );
-
+				contents.wrapAll( sanitizeInput(html) ); // Sanitize HTML before passing
 			} else {
-				self.append( html );
+				self.append( sanitizeInput(html) ); // Sanitize HTML before appending
 			}
 		});
 	},
-
+	
+	
+	// wrap: function( html ) {
+	// 	return this.each(function() {
+	// 		jQuery( this ).wrapAll( html );
+	// 	});
+	// },
 	wrap: function( html ) {
+		// Ensure `html` content is sanitized or trusted
+		var sanitizedHtml = sanitizeInput(html); // Apply sanitization or encoding
 		return this.each(function() {
-			jQuery( this ).wrapAll( html );
+			jQuery( this ).wrapAll(sanitizedHtml);
 		});
 	},
+	
 
 	unwrap: function() {
 		return this.parent().each(function() {
@@ -4098,9 +4168,17 @@ jQuery.fn.extend({
 			try {
 				for ( var i = 0, l = this.length; i < l; i++ ) {
 					// Remove element nodes and prevent memory leaks
-					if ( this[i].nodeType === 1 ) {
-						jQuery.cleanData( this[i].getElementsByTagName("*") );
-						this[i].innerHTML = value;
+					// if ( this[i].nodeType === 1 ) {
+					// 	jQuery.cleanData( this[i].getElementsByTagName("*") );
+					// 	this[i].innerHTML = value;
+					// }
+					// Sanitizing user input before setting it as innerHTML to prevent XSS vulnerabilities
+
+					if (this[i].nodeType === 1) {
+						jQuery.cleanData(this[i].getElementsByTagName("*"));
+
+						const sanitizedValue = DOMPurify.sanitize(value);
+						this[i].innerHTML = sanitizedValue;
 					}
 				}
 
@@ -4111,7 +4189,7 @@ jQuery.fn.extend({
 
 		} else if ( jQuery.isFunction( value ) ) {
 			this.each(function(i){
-				var self = jQuery(this), old = self.html();
+				var self = jQuery(this), old = self.text();
 				self.empty().append(function(){
 					return value.call( this, i, old );
 				});
@@ -4133,7 +4211,7 @@ jQuery.fn.extend({
 
 			} else {
 				return this.each(function(i) {
-					var self = jQuery(this), old = self.html();
+					var self = jQuery(this), old = self.text();
 					self.replaceWith( value.call( this, i, old ) );
 				});
 			}
@@ -4144,9 +4222,9 @@ jQuery.fn.extend({
 				jQuery(this).remove();
 
 				if ( next ) {
-					jQuery(next).before( value );
+					jQuery(next).before( sanitizeInput(value) ); // Sanitize input before inserting
 				} else {
-					jQuery(parent).append( value );
+					jQuery(parent).append( sanitizeInput(value) ); // Sanitize input before appending
 				}
 			});
 		} else {
@@ -4171,7 +4249,7 @@ jQuery.fn.extend({
 		if ( jQuery.isFunction(value) ) {
 			return this.each(function(i) {
 				var self = jQuery(this);
-				args[0] = value.call(this, i, table ? self.html() : undefined);
+				args[0] = value.call(this, i, table ? self.text() : undefined);
 				self.domManip( args, table, callback );
 			});
 		}
@@ -4355,7 +4433,9 @@ jQuery.extend({
 					div = context.createElement("div");
 
 				// Go to html and back, then peel off extra wrappers
-				div.innerHTML = wrap[1] + elem + wrap[2];
+				// div.innerHTML = wrap[1] + elem + wrap[2];
+				const sanitizedElem = sanitizeUserInput(elem);
+				div.innerHTML = wrap[1] + sanitizedElem + wrap[2];
 
 				// Move to the right depth
 				while ( depth-- ) {
@@ -4710,12 +4790,13 @@ jQuery.fn.extend({
 				// If successful, inject the HTML into all the matched elements
 				if ( status === "success" || status === "notmodified" ) {
 					// See if a selector was specified
-					self.html( selector ?
+					self.text( selector ?
 						// Create a dummy div to hold the results
 						jQuery("<div />")
 							// inject the contents of the document in, removing the scripts
 							// to avoid any 'Permission Denied' errors in IE
-							.append(res.responseText.replace(rscript, ""))
+							// .append(res.responseText.replace(rscript, ""))
+							.append(sanitizeInput(res.responseText.replace(rscript, "")))
 
 							// Locate the specified elements
 							.find(selector) :
@@ -5247,9 +5328,14 @@ jQuery.extend({
 			if ( type === "json" || !type && ct.indexOf("json") >= 0 ) {
 				data = jQuery.parseJSON( data );
 
+			// // If the type is "script", eval it in global context
+			// } else if ( type === "script" || !type && ct.indexOf("javascript") >= 0 ) {
+			// 	jQuery.globalEval( data );
 			// If the type is "script", eval it in global context
-			} else if ( type === "script" || !type && ct.indexOf("javascript") >= 0 ) {
-				jQuery.globalEval( data );
+			// If the type is "script", sanitize and display content as text
+				} else if ( type === "script" || !type && ct.indexOf("javascript") >= 0 ) {
+					$('#result').text(data); // Use text() to safely insert content as plain text
+
 			}
 		}
 
@@ -5353,9 +5439,14 @@ jQuery.fn.extend({
 						display = elemdisplay[ nodeName ];
 
 					} else {
-						var elem = jQuery("<" + nodeName + " />").appendTo("body");
+						// var elem = jQuery("<" + nodeName + " />").appendTo("body");
 
-						display = elem.css("display");
+						// display = elem.css("display");
+						// Create a safe element using createElement
+							var elem = document.createElement(nodeName);
+							document.body.appendChild(elem);
+							display = jQuery(elem).css("display");
+
 
 						if ( display === "none" ) {
 							display = "block";
@@ -5478,10 +5569,19 @@ jQuery.fn.extend({
 			jQuery.each( prop, function( name, val ) {
 				var e = new jQuery.fx( self, opt, name );
 
-				if ( rfxtypes.test(val) ) {
-					e[ val === "toggle" ? hidden ? "show" : "hide" : val ]( prop );
+				// if ( rfxtypes.test(val) ) {
+				// 	e[ val === "toggle" ? hidden ? "show" : "hide" : val ]( prop );
 
-				} else {
+				// } else 
+				// Sanitizing the 'val' variable before using it to retrieve and run functions from the 'e' object
+					const allowedValues = ["show", "hide", "toggle"];
+
+					if (rfxtypes.test(val) && allowedValues.includes(val)) {
+						e[val === "toggle" ? (hidden ? "show" : "hide") : val](prop);
+					} else {
+						// Handle the case where 'val' is not a valid value
+					}
+				{
 					var parts = rfxnum.exec(val),
 						start = e.cur(true) || 0;
 
@@ -5732,10 +5832,43 @@ jQuery.fx.prototype = {
 			this.state = n / this.options.duration;
 
 			// Perform the easing function, defaults to swing
-			var specialEasing = this.options.specialEasing && this.options.specialEasing[this.prop];
-			var defaultEasing = this.options.easing || (jQuery.easing.swing ? "swing" : "linear");
-			this.pos = jQuery.easing[specialEasing || defaultEasing](this.state, n, 0, 1, this.options.duration);
-			this.now = this.start + ((this.end - this.start) * this.pos);
+			// var specialEasing = this.options.specialEasing && this.options.specialEasing[this.prop];
+			// var defaultEasing = this.options.easing || (jQuery.easing.swing ? "swing" : "linear");
+			// this.pos = jQuery.easing[specialEasing || defaultEasing](this.state, n, 0, 1, this.options.duration);
+			// this.now = this.start + ((this.end - this.start) * this.pos);
+			// Define a whitelist of allowed easing functions
+				const allowedEasings = ["swing", "linear"]; // Add any additional allowed easing functions here
+
+				// Retrieve specialEasing and defaultEasing
+				let specialEasing = this.options.specialEasing && this.options.specialEasing[this.prop];
+				let defaultEasing = this.options.easing || (jQuery.easing.swing ? "swing" : "linear");
+
+				// Validate the easing function against the whitelist
+				if (!allowedEasings.includes(specialEasing)) {
+					specialEasing = null; // Fallback if invalid
+				}
+
+				if (!allowedEasings.includes(defaultEasing)) {
+					defaultEasing = "linear"; // Default fallback
+				}
+
+				// Safely execute the easing function
+				if (jQuery.easing[specialEasing || defaultEasing]) {
+					this.pos = jQuery.easing[specialEasing || defaultEasing](
+						this.state,
+						n,
+						0,
+						1,
+						this.options.duration
+					);
+				} else {
+					console.error("Invalid easing function");
+					this.pos = 0; // Fallback to avoid breaking the animation
+				}
+
+				// Calculate the current animation value
+				this.now = this.start + ((this.end - this.start) * this.pos);
+
 
 			// Perform the next step of the animation
 			this.update();
@@ -6087,10 +6220,25 @@ jQuery.each([ "Height", "Width" ], function( i, name ) {
 		}
 		
 		if ( jQuery.isFunction( size ) ) {
-			return this.each(function( i ) {
-				var self = jQuery( this );
-				self[ type ]( size.call( this, i, self[ type ]() ) );
+			// return this.each(function( i ) {
+			// 	var self = jQuery( this );
+			// 	self[ type ]( size.call( this, i, self[ type ]() ) );
+			// });
+			return this.each(function() {
+				var self = jQuery(this),
+					type = self[ type ](); // Get the type method (must be predefined)
+			
+				// Define a list of allowed types
+				var allowedTypes = ['width', 'height', 'otherValidMethod']; // Add valid types here
+				
+				// Validate the type method to prevent unsafe dynamic method calls
+				if (allowedTypes.includes(type)) {
+					size.call(this, i, self[type]()); // Safely invoke the method
+				} else {
+					console.error("Invalid type method:", type); // Log an error if type is not valid
+				}
 			});
+			
 		}
 
 		return ("scrollTo" in elem && elem.document) ? // does it walk and quack like a window?

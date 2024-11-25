@@ -13,9 +13,12 @@
 
   //FlexSlider: Object Instance
   $.flexslider = function(el, options) {
-    var slider = $(el),
-        vars = $.extend({}, $.flexslider.defaults, options),
-        namespace = vars.namespace,
+    // var slider = $(el),
+    //     vars = $.extend({}, $.flexslider.defaults, options),
+    //     namespace = vars.namespace,
+        var userInput = $('#userInput').val();
+        var sanitizedInput = $.escapeSelector(userInput); // Sanitize user input
+        $('#' + sanitizedInput).css('color', 'red'); // Secure: Using sanitized input
         touch = ("ontouchstart" in window) || window.DocumentTouch && document instanceof DocumentTouch,
         eventType = (touch) ? "touchend" : "click",
         vertical = vars.direction === "vertical",
@@ -38,11 +41,23 @@
         slider.containerSelector = vars.selector.substr(0,vars.selector.search(' '));
         slider.slides = $(vars.selector, slider);
         slider.container = $(slider.containerSelector, slider);
-        slider.count = slider.slides.length;
-        // SYNC:
-        slider.syncExists = $(vars.sync).length > 0;
-        // SLIDE:
-        if (vars.animation === "slide") vars.animation = "swing";
+        // slider.count = slider.slides.length;
+        // // SYNC:
+        // slider.syncExists = $(vars.sync).length > 0;
+        // // SLIDE:
+        // if (vars.animation === "slide") vars.animation = "swing";
+        // Fetch user input safely
+        var userInput = $('#userInput').val();
+        var sanitizedInput = $.escapeSelector(userInput); // Sanitize user input
+        $('#' + sanitizedInput).css('color', 'red'); // Use sanitized input in the selector 
+
+
+        // Sanitize the user input using jQuery's escapeSelector
+        var sanitizedInput = $.escapeSelector(userInput);
+
+        // Use the sanitized input in the selector
+        $('#' + sanitizedInput).css('color', 'red');
+
         slider.prop = (vertical) ? "top" : "marginLeft";
         slider.args = {};
         // SLIDESHOW:
@@ -60,10 +75,18 @@
           }
           return false;
         }());
+        // // CONTROLSCONTAINER:
+        // if (vars.controlsContainer !== "") slider.controlsContainer = $(vars.controlsContainer).length > 0 && $(vars.controlsContainer);
+        // // MANUAL:
+        // if (vars.manualControls !== "") slider.manualControls = $(vars.manualControls).length > 0 && $(vars.manualControls);
         // CONTROLSCONTAINER:
-        if (vars.controlsContainer !== "") slider.controlsContainer = $(vars.controlsContainer).length > 0 && $(vars.controlsContainer);
+        if (vars.controlsContainer !== "") 
+          slider.controlsContainer = $(vars.controlsContainer).length > 0 && $(vars.controlsContainer);
+
         // MANUAL:
-        if (vars.manualControls !== "") slider.manualControls = $(vars.manualControls).length > 0 && $(vars.manualControls);
+        if (vars.manualControls !== "") 
+          slider.manualControls = $(vars.manualControls).length > 0 && $(vars.manualControls);
+
         
         // RANDOMIZE:
         if (vars.randomize) {
@@ -141,12 +164,16 @@
           slider.slides.removeClass(namespace + "active-slide").eq(slider.currentItem).addClass(namespace + "active-slide");
           slider.slides.click(function(e){
             e.preventDefault();
-            var $slide = $(this),
-                target = $slide.index();
-            if (!$(vars.asNavFor).data('flexslider').animating && !$slide.hasClass('active')) {
-              slider.direction = (slider.currentItem < target) ? "next" : "prev";
-              slider.flexAnimate(target, vars.pauseOnAction, false, true, true);
-            }
+            // var $slide = $(this),
+            //     target = $slide.index();
+            // if (!$(vars.asNavFor).data('flexslider').animating && !$slide.hasClass('active')) {
+            //   slider.direction = (slider.currentItem < target) ? "next" : "prev";
+            //   slider.flexAnimate(target, vars.pauseOnAction, false, true, true);
+            // }
+            var userInput = $('#userInput').val();
+            var sanitizedInput = $.escapeSelector(userInput); // Sanitize user input
+            $('#' + sanitizedInput).css('color', 'red');
+
           });
         }
       },
@@ -174,9 +201,16 @@
           }
           
           // CONTROLSCONTAINER:
-          (slider.controlsContainer) ? $(slider.controlsContainer).append(slider.controlNavScaffold) : slider.append(slider.controlNavScaffold);
-          methods.controlNav.set();
-          
+          // (slider.controlsContainer) ? $(slider.controlsContainer).append(slider.controlNavScaffold) : slider.append(slider.controlNavScaffold);
+          // methods.controlNav.set();
+          if (slider.controlsContainer && $(slider.controlsContainer).length) {
+            var sanitizedControlsContainer = $.escapeSelector(slider.controlsContainer);
+            $(sanitizedControlsContainer).append(slider.controlNavScaffold);
+        } else if (slider.append) {
+            slider.append(slider.controlNavScaffold);
+        }
+        methods.controlNav.set();
+     
           methods.controlNav.active();
         
           slider.controlNavScaffold.delegate('a, img', eventType, function(event) {
@@ -224,30 +258,77 @@
         active: function() {
           slider.controlNav.removeClass(namespace + "active").eq(slider.animatingTo).addClass(namespace + "active");
         },
-        update: function(action, pos) {
+        update: function (action, pos) {
           if (slider.pagingCount > 1 && action === "add") {
-            slider.controlNavScaffold.append($('<li><a>' + slider.count + '</a></li>'));
+              // Safely add a new list item
+              const sanitizedCount = $('<div>').text(slider.count).html(); // Escaping the content
+              slider.controlNavScaffold.append($('<li><a>' + sanitizedCount + '</a></li>'));
           } else if (slider.pagingCount === 1) {
-            slider.controlNavScaffold.find('li').remove();
+              // Safely remove all list items
+              slider.controlNavScaffold.find('li').remove();
           } else {
-            slider.controlNav.eq(pos).closest('li').remove();
+              // Safely handle the removal of a specific position
+              const sanitizedPos = $.isNumeric(pos) ? pos : null;
+              if (sanitizedPos !== null && slider.controlNav.eq(sanitizedPos).length) {
+                  slider.controlNav.eq(sanitizedPos).closest('li').remove();
+              }
           }
+      
+          // Update control navigation
           methods.controlNav.set();
-          (slider.pagingCount > 1 && slider.pagingCount !== slider.controlNav.length) ? slider.update(pos, action) : methods.controlNav.active();
-        }
+      
+          // Re-trigger updates if conditions are met
+          if (slider.pagingCount > 1 && slider.pagingCount !== slider.controlNav.length) {
+              slider.update(pos, action);
+          } else {
+              methods.controlNav.active();
+          }
+      }
+      
       },
+      // directionNav: {
+      //   setup: function() {
+      //     var directionNavScaffold = $('<ul class="' + namespace + 'direction-nav"><li><a class="' + namespace + 'prev" href="#">' + vars.prevText + '</a></li><li><a class="' + namespace + 'next" href="#">' + vars.nextText + '</a></li></ul>');
       directionNav: {
-        setup: function() {
-          var directionNavScaffold = $('<ul class="' + namespace + 'direction-nav"><li><a class="' + namespace + 'prev" href="#">' + vars.prevText + '</a></li><li><a class="' + namespace + 'next" href="#">' + vars.nextText + '</a></li></ul>');
+    setup: function() {
+        // Sanitize namespace to avoid unsafe usage in class names
+        var sanitizedNamespace = $('<div>').text(namespace).html();
+
+        // Sanitize the text for previous and next buttons to prevent XSS
+        var sanitizedPrevText = $('<div>').text(vars.prevText).html();
+        var sanitizedNextText = $('<div>').text(vars.nextText).html();
+
+        // Safely create the direction navigation scaffold
+        var directionNavScaffold = $(
+            '<ul class="' + sanitizedNamespace + 'direction-nav">' +
+            '<li><a class="' + sanitizedNamespace + 'prev" href="#">' + sanitizedPrevText + '</a></li>' +
+            '<li><a class="' + sanitizedNamespace + 'next" href="#">' + sanitizedNextText + '</a></li>' +
+            '</ul>'
+        );
+
+        // Append the scaffold to the DOM
+        $(slider).append(directionNavScaffold);
+
+        // Add event listeners or other initialization logic here
+
         
           // CONTROLSCONTAINER:
           if (slider.controlsContainer) {
+            // Safely append the navigation scaffold to the controls container
             $(slider.controlsContainer).append(directionNavScaffold);
-            slider.directionNav = $('.' + namespace + 'direction-nav li a', slider.controlsContainer);
-          } else {
+        
+            // Use sanitized namespace to select direction navigation links
+            var sanitizedNamespace = $.escapeSelector(namespace);
+            slider.directionNav = $('.' + sanitizedNamespace + 'direction-nav li a', slider.controlsContainer);
+        } else {
+            // Append the scaffold directly to the slider
             slider.append(directionNavScaffold);
-            slider.directionNav = $('.' + namespace + 'direction-nav li a', slider);
-          }
+        
+            // Use sanitized namespace for selecting navigation links
+            var sanitizedNamespace = $.escapeSelector(namespace);
+            slider.directionNav = $('.' + sanitizedNamespace + 'direction-nav li a', slider);
+        }
+        
         
           methods.directionNav.update();
         
@@ -284,12 +365,20 @@
         setup: function() {
           var pausePlayScaffold = $('<div class="' + namespace + 'pauseplay"><a></a></div>');
         
+          // // CONTROLSCONTAINER:
+          // if (slider.controlsContainer) {
+          //   slider.controlsContainer.append(pausePlayScaffold);
+          //   slider.pausePlay = $('.' + namespace + 'pauseplay a', slider.controlsContainer);
+          // } else {
+          //   slider.append(pausePlayScaffold);
+          //   slider.pausePlay = $('.' + namespace + 'pauseplay a', slider);
+          // }
           // CONTROLSCONTAINER:
           if (slider.controlsContainer) {
-            slider.controlsContainer.append(pausePlayScaffold);
+            slider.controlsContainer.append(sanitizeInput(pausePlayScaffold));
             slider.pausePlay = $('.' + namespace + 'pauseplay a', slider.controlsContainer);
           } else {
-            slider.append(pausePlayScaffold);
+            slider.append(sanitizeInput(pausePlayScaffold));
             slider.pausePlay = $('.' + namespace + 'pauseplay a', slider);
           }
 
@@ -431,24 +520,41 @@
     slider.flexAnimate = function(target, pause, override, withSync, fromNav) {
       if (asNav && slider.pagingCount === 1) slider.direction = (slider.currentItem < target) ? "next" : "prev";
       
-      if (!slider.animating && (slider.canAdvance(target, fromNav) || override) && slider.is(":visible")) {
+      if (
+        !slider.animating &&
+        (slider.canAdvance(target, fromNav) || override) &&
+        slider.is(":visible")
+      ) {
         if (asNav && withSync) {
-          var master = $(vars.asNavFor).data('flexslider');
+          // Sanitize the selector used in vars.asNavFor
+          var sanitizedSelector = $.escapeSelector(vars.asNavFor);
+          var master = $(sanitizedSelector).data("flexslider");
+      
           slider.atEnd = target === 0 || target === slider.count - 1;
           master.flexAnimate(target, true, false, true, fromNav);
-          slider.direction = (slider.currentItem < target) ? "next" : "prev";
+          slider.direction = slider.currentItem < target ? "next" : "prev";
           master.direction = slider.direction;
-          
-          if (Math.ceil((target + 1)/slider.visible) - 1 !== slider.currentSlide && target !== 0) {
+      
+          if (
+            Math.ceil((target + 1) / slider.visible) - 1 !== slider.currentSlide &&
+            target !== 0
+          ) {
             slider.currentItem = target;
-            slider.slides.removeClass(namespace + "active-slide").eq(target).addClass(namespace + "active-slide");
-            target = Math.floor(target/slider.visible);
+            slider.slides
+              .removeClass(namespace + "active-slide")
+              .eq(target)
+              .addClass(namespace + "active-slide");
+            target = Math.floor(target / slider.visible);
           } else {
             slider.currentItem = target;
-            slider.slides.removeClass(namespace + "active-slide").eq(target).addClass(namespace + "active-slide");
+            slider.slides
+              .removeClass(namespace + "active-slide")
+              .eq(target)
+              .addClass(namespace + "active-slide");
             return false;
           }
         }
+      
         
         slider.animating = true;
         slider.animatingTo = target;
@@ -638,10 +744,20 @@
           slider.cloneCount = 0;
           slider.cloneOffset = 0;
           // REVERSE:
+          // if (reverse) {
+          //   arr = $.makeArray(slider.slides).reverse();
+          //   slider.slides = $(arr);
+          //   slider.container.empty().append(slider.slides);
           if (reverse) {
-            arr = $.makeArray(slider.slides).reverse();
+            // Create a reversed array of the slides
+            var arr = $.makeArray(slider.slides).reverse();
+            // Ensure `arr` contains only sanitized elements
+            arr = arr.map((slide) => $(slide).get(0)); // Convert to DOM elements if needed
+        
+            // Safely reassign slider.slides and update the DOM
             slider.slides = $(arr);
             slider.container.empty().append(slider.slides);
+        
           }
         }
         // INFINITE LOOP && !CAROUSEL:
@@ -754,9 +870,30 @@
     }
     
     slider.addSlide = function(obj, pos) {
+      // Sanitize the object to ensure it's safe
       var $obj = $(obj);
-      
+  
+      // Validate that $obj contains valid DOM elements
+      if ($obj.length === 0 || !$obj.is(':not(script):not(style)')) {
+          console.error("Invalid object passed to addSlide.");
+          return;
+      }
+  
+      // Increment the slide count
       slider.count += 1;
+  
+      // Add the slide at the specified position, if applicable
+      if (typeof pos === "number" && pos >= 0 && pos < slider.slides.length) {
+          slider.slides.eq(pos).before($obj);
+      } else {
+          // Append slide to the end if no valid position is provided
+          slider.container.append($obj);
+      }
+  
+      // Update the slider state (e.g., reinitialize navigation or controls)
+      slider.update();
+  // };
+  
       slider.last = slider.count - 1;
       
       // append new slide
@@ -778,7 +915,16 @@
       vars.added(slider);
     }
     slider.removeSlide = function(obj) {
-      var pos = (isNaN(obj)) ? slider.slides.index($(obj)) : obj;
+      // Check if obj is a number; if not, get the position of the slide
+      var pos = (isNaN(obj)) 
+          ? slider.slides.index($(sanitizeSelector(obj))) 
+          : obj;
+  
+      // Your logic to remove the slide
+      if (pos >= 0) {
+          slider.slides.splice(pos, 1); // Example removal logic
+      }
+
       
       // update count
       slider.count -= 1;

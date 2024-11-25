@@ -77,11 +77,21 @@
 
 		if (e) e.preventDefault();
 
-		var $target = $(settings.target);
+var $target = $(sanitizeSelector(settings.target));
 
-		if (settings.lock && $target.is(':animated') ||
-			settings.onBefore && settings.onBefore(e, elem, $target) === false)
-			return;
+if (settings.lock && $target.is(':animated') || 
+    settings.onBefore && settings.onBefore(e, elem, $target) === false) {
+    return;
+}
+
+// Helper function to sanitize selectors
+function sanitizeSelector(input) {
+    if (typeof input === 'string') {
+        return $.escapeSelector(input); // Sanitize the input string
+    }
+    return input; // If it's not a string, return it as is
+}
+
 
 		if (settings.stop) {
 			$target.stop(true); // remove all its animations
@@ -95,10 +105,23 @@
 					left: $(window).scrollLeft()
 				});
 
-			elem[attr] = '';
-			$('body').prepend($a);
-			location.hash = link.hash;
-			$a.remove();
+			// Ensure the attribute name is safe (if 'attr' is user-controlled)
+			var validAttributes = ["href", "src", "alt"]; // Example of allowed attributes
+			if (validAttributes.includes(attr)) {
+				elem[attr] = '';  // Only set valid attributes
+			}
+
+			// Prepend content safely
+			var $safeAnchor = $('<a>').text($a.text()).attr('href', $a.attr('href'));
+			$('body').prepend($safeAnchor);
+
+			// Ensure location.hash is safe before assignment
+			var sanitizedHash = encodeURIComponent(link.hash); // Sanitize the hash value
+			location.hash = sanitizedHash;
+
+			// Remove the element after use
+			$safeAnchor.remove();
+
 			elem[attr] = id;
 		}
 

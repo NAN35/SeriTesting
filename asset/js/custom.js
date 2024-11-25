@@ -5,18 +5,36 @@ jQuery(document).ready(function($) {
 		return false;
 	});
 	
-		$('.accordion').on('show', function (e) {
+		// $('.accordion').on('show', function (e) {
 		
-			$(e.target).prev('.accordion-heading').find('.accordion-toggle').addClass('active');
-			$(e.target).prev('.accordion-heading').find('.accordion-toggle i').removeClass('icon-plus');
-			$(e.target).prev('.accordion-heading').find('.accordion-toggle i').addClass('icon-minus');
+		// 	$(e.target).prev('.accordion-heading').find('.accordion-toggle').addClass('active');
+		// 	$(e.target).prev('.accordion-heading').find('.accordion-toggle i').removeClass('icon-plus');
+		// 	$(e.target).prev('.accordion-heading').find('.accordion-toggle i').addClass('icon-minus');
+		// });
+		
+		// $('.accordion').on('hide', function (e) {
+		// 	$(this).find('.accordion-toggle').not($(e.target)).removeClass('active');
+		// 	$(this).find('.accordion-toggle i').not($(e.target)).removeClass('icon-minus');
+		// 	$(this).find('.accordion-toggle i').not($(e.target)).addClass('icon-plus');
+		// });	
+
+		$('.accordion').on('show', function (e) {
+			const $target = $(e.target).prev('.accordion-heading');
+			$target.find('.accordion-toggle').addClass('active');
+			$target.find('.accordion-toggle i')
+				.removeClass('icon-plus')
+				.addClass('icon-minus');
 		});
 		
 		$('.accordion').on('hide', function (e) {
-			$(this).find('.accordion-toggle').not($(e.target)).removeClass('active');
-			$(this).find('.accordion-toggle i').not($(e.target)).removeClass('icon-minus');
-			$(this).find('.accordion-toggle i').not($(e.target)).addClass('icon-plus');
-		});	
+			const $accordion = $(this);
+			$accordion.find('.accordion-toggle').not(e.target).removeClass('active');
+			$accordion.find('.accordion-toggle i')
+				.not(e.target)
+				.removeClass('icon-minus')
+				.addClass('icon-plus');
+		});
+		
 
 	$('.navigation').onePageNav({
 		begin: function() {

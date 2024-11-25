@@ -68,9 +68,16 @@
 			var win = isWin(this),
 				elem = win ? this.contentWindow || window : this,
 				$elem = $(elem),
-				targ = target, 
+				targ = target,  // Assuming `target` is user-controlled or dynamic
 				attr = {},
 				toff;
+
+			// Sanitize `targ` to ensure it is safe for use in a jQuery selector
+			var sanitizedTarg = $.escapeSelector(targ);
+
+			// Now you can safely use `sanitizedTarg` in any jQuery selectors or manipulations
+			$elem.find('#' + sanitizedTarg).css('color', 'red'); // Example of using sanitizedTarg
+
 
 			switch (typeof targ) {
 				// A number will pass the regex
@@ -82,15 +89,29 @@
 						break;
 					}
 					// Relative/Absolute selector
-					targ = win ? $(targ) : $(targ, elem);
+					var win = isWin(this),
+					elem = win ? this.contentWindow || window : this,
+					$elem = $(elem),
+					targ = target;  // Assuming `target` is user-controlled or dynamic
+
+				// Sanitize `targ` to ensure it is safe for use in a jQuery selector
+				var sanitizedTarg = $.escapeSelector(targ);
+
+				// Now use the sanitized `targ` safely in jQuery selectors
+				targ = win ? $(sanitizedTarg) : $(sanitizedTarg, elem);
+
 					/* falls through */
 				case 'object':
 					if (targ.length === 0) return;
 					// DOMElement / jQuery
 					if (targ.is || targ.style) {
-						// Get the real position of the target
-						toff = (targ = $(targ)).offset();
+						// Sanitize `targ` to prevent any unsafe selectors
+						var sanitizedTarg = $.escapeSelector(targ);
+						
+						// Get the real position of the sanitized target
+						toff = (targ = $(sanitizedTarg)).offset();
 					}
+					
 			}
 
 			var offset = $.isFunction(settings.offset) && settings.offset(elem, targ) || settings.offset;
@@ -168,10 +189,28 @@
 		var Dim = axis === 'x' ? 'Width' : 'Height',
 			scroll = 'scroll'+Dim;
 
-		if (!isWin(elem))
-			return elem[scroll] - $(elem)[Dim.toLowerCase()]();
+		// if (!isWin(elem))
+		// 	return elem[scroll] - $(elem)[Dim.toLowerCase()]();
 
-		var size = 'client' + Dim,
+		// var size = 'client' + Dim,
+		// Define the valid dimension methods
+			const validDimensions = ['width', 'height'];
+
+			// Check if Dim is a valid dimension
+			if (validDimensions.includes(Dim.toLowerCase())) {
+				// Safely access the method based on Dim
+				var size = 'client' + Dim;
+				if (isWin(elem)) {
+					// Assuming `scroll` is a valid property or method
+					return elem.scroll - $(elem)[Dim.toLowerCase()]();
+				} else {
+					// Handle non-window elements or cases where `isWin` is false
+					return elem.scroll - $(elem)[size]();
+				}
+			} else {
+				console.error("Invalid dimension method:", Dim);
+			}
+
 			doc = elem.ownerDocument || elem.document,
 			html = doc.documentElement,
 			body = doc.body;
@@ -184,26 +223,60 @@
 	}
 
 	// Add special hooks so that window scroll properties can be animated
-	$.Tween.propHooks.scrollLeft = 
-	$.Tween.propHooks.scrollTop = {
-		get: function(t) {
-			return $(t.elem)[t.prop]();
-		},
-		set: function(t) {
-			var curr = this.get(t);
-			// If interrupt is true and user scrolled, stop animating
-			if (t.options.interrupt && t._last && t._last !== curr) {
-				return $(t.elem).stop();
-			}
-			var next = Math.round(t.now);
-			// Don't waste CPU
-			// Browsers don't render floating point scroll
-			if (curr !== next) {
-				$(t.elem)[t.prop](next);
+	// Predefine the allowed properties (scrollTop, scrollLeft)
+const validProps = ['scrollTop', 'scrollLeft'];
+
+// Hook for scrollLeft and scrollTop properties
+$.Tween.propHooks.scrollLeft = $.Tween.propHooks.scrollTop = {
+    get: function(t) {
+        // Ensure the prop is valid before accessing it
+        if (validProps.includes(t.prop)) {
+            return $(t.elem)[t.prop]();
+        } else {
+            console.error("Invalid property:", t.prop);
+            return 0; // Return a default value in case of invalid prop
+        }
+    },
+    set: function(t) {
+        var curr = this.get(t);
+
+        // If interrupt is true and user scrolled, stop animating
+if (t.options.interrupt && t._last && t._last !== curr) {
+    return $(t.elem).stop();
+}
+
+// Sanitize dynamic data (e.g., t.elem) before using it in a selector
+var sanitizedElem = $.escapeSelector(t.elem);
+
+// Proceed with the animation logic using the sanitized selector
+var next = Math.round(t.now);
+
+        
+        // Don't waste CPU on floating-point scroll
+        if (curr !== next) {
+			// Ensure the prop is valid before setting it
+			if (validProps.includes(t.prop)) {
+				// Explicitly call the valid method instead of dynamic method invocation
+				switch (t.prop) {
+					case 'someValidMethod':
+						$(t.elem).someValidMethod(next);
+						break;
+					case 'anotherValidMethod':
+						$(t.elem).anotherValidMethod(next);
+						break;
+					// Add more predefined method cases as needed
+					default:
+						console.error("Unknown valid method:", t.prop);
+				}
 				t._last = this.get(t);
+			} else {
+				console.error("Invalid property:", t.prop);
 			}
 		}
-	};
+		
+    }
+};
+
 
 	// AMD requirement
 	return $scrollTo;
