@@ -77,11 +77,21 @@
 
 		if (e) e.preventDefault();
 
-		var $target = $(settings.target);
+var $target = $(sanitizeSelector(settings.target));
 
-		if (settings.lock && $target.is(':animated') ||
-			settings.onBefore && settings.onBefore(e, elem, $target) === false)
-			return;
+if (settings.lock && $target.is(':animated') || 
+    settings.onBefore && settings.onBefore(e, elem, $target) === false) {
+    return;
+}
+
+// Helper function to sanitize selectors
+function sanitizeSelector(input) {
+    if (typeof input === 'string') {
+        return $.escapeSelector(input); // Sanitize the input string
+    }
+    return input; // If it's not a string, return it as is
+}
+
 
 		if (settings.stop) {
 			$target.stop(true); // remove all its animations

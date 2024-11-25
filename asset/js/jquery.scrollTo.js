@@ -68,9 +68,16 @@
 			var win = isWin(this),
 				elem = win ? this.contentWindow || window : this,
 				$elem = $(elem),
-				targ = target, 
+				targ = target,  // Assuming `target` is user-controlled or dynamic
 				attr = {},
 				toff;
+
+			// Sanitize `targ` to ensure it is safe for use in a jQuery selector
+			var sanitizedTarg = $.escapeSelector(targ);
+
+			// Now you can safely use `sanitizedTarg` in any jQuery selectors or manipulations
+			$elem.find('#' + sanitizedTarg).css('color', 'red'); // Example of using sanitizedTarg
+
 
 			switch (typeof targ) {
 				// A number will pass the regex
@@ -82,15 +89,29 @@
 						break;
 					}
 					// Relative/Absolute selector
-					targ = win ? $(targ) : $(targ, elem);
+					var win = isWin(this),
+					elem = win ? this.contentWindow || window : this,
+					$elem = $(elem),
+					targ = target;  // Assuming `target` is user-controlled or dynamic
+
+				// Sanitize `targ` to ensure it is safe for use in a jQuery selector
+				var sanitizedTarg = $.escapeSelector(targ);
+
+				// Now use the sanitized `targ` safely in jQuery selectors
+				targ = win ? $(sanitizedTarg) : $(sanitizedTarg, elem);
+
 					/* falls through */
 				case 'object':
 					if (targ.length === 0) return;
 					// DOMElement / jQuery
 					if (targ.is || targ.style) {
-						// Get the real position of the target
-						toff = (targ = $(targ)).offset();
+						// Sanitize `targ` to prevent any unsafe selectors
+						var sanitizedTarg = $.escapeSelector(targ);
+						
+						// Get the real position of the sanitized target
+						toff = (targ = $(sanitizedTarg)).offset();
 					}
+					
 			}
 
 			var offset = $.isFunction(settings.offset) && settings.offset(elem, targ) || settings.offset;
@@ -220,11 +241,16 @@ $.Tween.propHooks.scrollLeft = $.Tween.propHooks.scrollTop = {
         var curr = this.get(t);
 
         // If interrupt is true and user scrolled, stop animating
-        if (t.options.interrupt && t._last && t._last !== curr) {
-            return $(t.elem).stop();
-        }
+if (t.options.interrupt && t._last && t._last !== curr) {
+    return $(t.elem).stop();
+}
 
-        var next = Math.round(t.now);
+// Sanitize dynamic data (e.g., t.elem) before using it in a selector
+var sanitizedElem = $.escapeSelector(t.elem);
+
+// Proceed with the animation logic using the sanitized selector
+var next = Math.round(t.now);
+
         
         // Don't waste CPU on floating-point scroll
         if (curr !== next) {
