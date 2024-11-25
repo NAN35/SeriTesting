@@ -111,9 +111,8 @@ jQuery(document).ready(function($) {
         } else {
           $("#sendmessage").removeClass("show");
           $("#errormessage").addClass("show");
-          $('#errormessage').html(msg);
+          $('#errormessage').text(msg);  // Use text() instead of html()
         }
-
       }
     });
     return false;

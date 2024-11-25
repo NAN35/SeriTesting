@@ -365,12 +365,20 @@
         setup: function() {
           var pausePlayScaffold = $('<div class="' + namespace + 'pauseplay"><a></a></div>');
         
+          // // CONTROLSCONTAINER:
+          // if (slider.controlsContainer) {
+          //   slider.controlsContainer.append(pausePlayScaffold);
+          //   slider.pausePlay = $('.' + namespace + 'pauseplay a', slider.controlsContainer);
+          // } else {
+          //   slider.append(pausePlayScaffold);
+          //   slider.pausePlay = $('.' + namespace + 'pauseplay a', slider);
+          // }
           // CONTROLSCONTAINER:
           if (slider.controlsContainer) {
-            slider.controlsContainer.append(pausePlayScaffold);
+            slider.controlsContainer.append(sanitizeInput(pausePlayScaffold));
             slider.pausePlay = $('.' + namespace + 'pauseplay a', slider.controlsContainer);
           } else {
-            slider.append(pausePlayScaffold);
+            slider.append(sanitizeInput(pausePlayScaffold));
             slider.pausePlay = $('.' + namespace + 'pauseplay a', slider);
           }
 

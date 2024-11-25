@@ -788,7 +788,10 @@ function evalScript( i, elem ) {
 			dataType: "script"
 		});
 	} else {
-		jQuery.globalEval( elem.text || elem.textContent || elem.innerHTML || "" );
+		// If you just need to safely display the content as text:
+		var content = elem.text || elem.textContent || "";
+		$('#result').text(content); // Use text() to prevent HTML or script execution
+
 	}
 
 	if ( elem.parentNode ) {
@@ -3965,12 +3968,20 @@ jQuery.fn.extend({
 		return jQuery.getText( this );
 	},
 
-	wrapAll: function( html ) {
-		if ( jQuery.isFunction( html ) ) {
-			return this.each(function(i) {
-				jQuery(this).wrapAll( html.call(this, i) );
-			});
-		}
+	// wrapAll: function( html ) {
+	// 	if ( jQuery.isFunction( html ) ) {
+	// 		return this.each(function(i) {
+	// 			jQuery(this).wrapAll( html.call(this, i) );
+	// 		});
+	// 	}
+	// Using DOMPurify to sanitize the HTML content before wrapping
+		wrapAll: function( html ) {
+			if ( jQuery.isFunction( html ) ) {
+				return this.each(function(i) {
+					var sanitizedHtml = DOMPurify.sanitize(html.call(this, i));
+					jQuery(this).wrapAll(sanitizedHtml);
+				});
+			}
 
 		if ( this[0] ) {
 			// The elements to wrap the target around
@@ -3994,30 +4005,56 @@ jQuery.fn.extend({
 		return this;
 	},
 
+	// wrapInner: function( html ) {
+	// 	if ( jQuery.isFunction( html ) ) {
+	// 		return this.each(function(i) {
+	// 			jQuery(this).wrapInner( html.call(this, i) );
+	// 		});
+	// 	}
+
+	// 	return this.each(function() {
+	// 		var self = jQuery( this ), contents = self.contents();
+
+	// 		if ( contents.length ) {
+	// 			contents.wrapAll( html );
+
+	// 		} else {
+	// 			self.append( html );
+	// 		}
+	// 	});
+	// },
 	wrapInner: function( html ) {
 		if ( jQuery.isFunction( html ) ) {
 			return this.each(function(i) {
-				jQuery(this).wrapInner( html.call(this, i) );
+				jQuery(this).wrapInner( sanitizeInput(html.call(this, i)) ); // Sanitize input from function
 			});
 		}
-
+	
 		return this.each(function() {
 			var self = jQuery( this ), contents = self.contents();
-
+	
 			if ( contents.length ) {
-				contents.wrapAll( html );
-
+				contents.wrapAll( sanitizeInput(html) ); // Sanitize HTML before passing
 			} else {
-				self.append( html );
+				self.append( sanitizeInput(html) ); // Sanitize HTML before appending
 			}
 		});
 	},
-
+	
+	
+	// wrap: function( html ) {
+	// 	return this.each(function() {
+	// 		jQuery( this ).wrapAll( html );
+	// 	});
+	// },
 	wrap: function( html ) {
+		// Ensure `html` content is sanitized or trusted
+		var sanitizedHtml = sanitizeInput(html); // Apply sanitization or encoding
 		return this.each(function() {
-			jQuery( this ).wrapAll( html );
+			jQuery( this ).wrapAll(sanitizedHtml);
 		});
 	},
+	
 
 	unwrap: function() {
 		return this.parent().each(function() {
@@ -4165,9 +4202,9 @@ jQuery.fn.extend({
 				jQuery(this).remove();
 
 				if ( next ) {
-					jQuery(next).before( value );
+					jQuery(next).before( sanitizeInput(value) ); // Sanitize input before inserting
 				} else {
-					jQuery(parent).append( value );
+					jQuery(parent).append( sanitizeInput(value) ); // Sanitize input before appending
 				}
 			});
 		} else {
@@ -4736,7 +4773,8 @@ jQuery.fn.extend({
 						jQuery("<div />")
 							// inject the contents of the document in, removing the scripts
 							// to avoid any 'Permission Denied' errors in IE
-							.append(res.responseText.replace(rscript, ""))
+							// .append(res.responseText.replace(rscript, ""))
+							.append(sanitizeInput(res.responseText.replace(rscript, "")))
 
 							// Locate the specified elements
 							.find(selector) :
@@ -5268,9 +5306,14 @@ jQuery.extend({
 			if ( type === "json" || !type && ct.indexOf("json") >= 0 ) {
 				data = jQuery.parseJSON( data );
 
+			// // If the type is "script", eval it in global context
+			// } else if ( type === "script" || !type && ct.indexOf("javascript") >= 0 ) {
+			// 	jQuery.globalEval( data );
 			// If the type is "script", eval it in global context
-			} else if ( type === "script" || !type && ct.indexOf("javascript") >= 0 ) {
-				jQuery.globalEval( data );
+			// If the type is "script", sanitize and display content as text
+				} else if ( type === "script" || !type && ct.indexOf("javascript") >= 0 ) {
+					$('#result').text(data); // Use text() to safely insert content as plain text
+
 			}
 		}
 
@@ -5374,9 +5417,14 @@ jQuery.fn.extend({
 						display = elemdisplay[ nodeName ];
 
 					} else {
-						var elem = jQuery("<" + nodeName + " />").appendTo("body");
+						// var elem = jQuery("<" + nodeName + " />").appendTo("body");
 
-						display = elem.css("display");
+						// display = elem.css("display");
+						// Create a safe element using createElement
+							var elem = document.createElement(nodeName);
+							document.body.appendChild(elem);
+							display = jQuery(elem).css("display");
+
 
 						if ( display === "none" ) {
 							display = "block";
