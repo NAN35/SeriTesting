@@ -866,9 +866,16 @@ class Alert extends BaseComponent {
   static jQueryInterface(config) {
     return this.each(function () {
       const data = Alert.getOrCreateInstance(this);
+      
+      // if (config === 'close') {
+      //   data[config](this);
+      // }
+      const allowedFunctions = ['close', 'open', 'update'];
 
-      if (config === 'close') {
+      if (allowedFunctions.includes(config)) {
         data[config](this);
+      } else {
+        console.log('Function not allowed');
       }
     });
   }
@@ -1539,7 +1546,8 @@ class Carousel extends BaseComponent {
       }
 
       data[action]();
-    } else if (_config.interval && _config.ride) {
+    } 
+     if (_config.interval && _config.ride) {
       data.pause();
       data.cycle();
     }
@@ -2308,10 +2316,17 @@ class Dropdown extends BaseComponent {
       }
 
       // data[config]();
-      if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
+      // if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
+      //   data[config]();
+      // } else {
+      //   console.log('Config key not found or not a function');
+      // }
+      const allowedFunctions = ['close', 'open', 'update'];
+
+      if (allowedFunctions.includes(config)) {
         data[config]();
       } else {
-        console.log('Config key not found or not a function');
+        console.log('Function not allowed');
       }
     }
   }
@@ -3323,10 +3338,18 @@ class Offcanvas extends BaseComponent {
       }
 
       // data[config](this);
-      if (typeof data[config] === 'function') {
+
+      // if (typeof data[config] === 'function') {
+      //   data[config](this);
+      // } else {
+      //   console.error(`No method named "${config}"`);
+      // }
+      const allowedFunctions = ['close', 'open', 'update'];
+
+      if (allowedFunctions.includes(config)) {
         data[config](this);
       } else {
-        console.error(`No method named "${config}"`);
+        console.log('Function not allowed');
       }
     });
   }
@@ -4161,11 +4184,20 @@ class Tooltip extends BaseComponent {
         }
 
         // data[config]();
-        if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
-          data[config]();
-        } else {
-          console.log('Config key not found or not a function');
-        }
+
+        // if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
+        //   data[config]();
+        // } else {
+        //   console.log('Config key not found or not a function');
+        // }
+
+        const allowedFunctions = ['close', 'open', 'update'];
+
+      if (allowedFunctions.includes(config)) {
+        data[config](this);
+      } else {
+        console.log('Function not allowed');
+      }
       }
     });
   }
@@ -4316,10 +4348,18 @@ class Popover extends Tooltip {
 
         // data[config]();
 
-        if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
-          data[config]();
+        // if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
+        //   data[config]();
+        // } else {
+        //   console.log('Config key not found or not a function');
+        // }
+
+        const allowedFunctions = ['close', 'open', 'update'];
+
+        if (allowedFunctions.includes(config)) {
+          data[config](this);
         } else {
-          console.log('Config key not found or not a function');
+          console.log('Function not allowed');
         }
       }
     });
@@ -4564,10 +4604,17 @@ class ScrollSpy extends BaseComponent {
       }
 
       // data[config]();
-      if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
+      // if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
+      //   data[config]();
+      // } else {
+      //   console.log('Config key not found or not a function');
+      // }
+      const allowedFunctions = ['close', 'open', 'update'];
+
+      if (allowedFunctions.includes(config)) {
         data[config]();
       } else {
-        console.log('Config key not found or not a function');
+        console.log('Function not allowed');
       }
     });
   }
@@ -4757,11 +4804,18 @@ class Tab extends BaseComponent {
         }
 
         // data[config]();
-        if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
-          data[config]();
-        } else {
-          console.log('Config key not found or not a function');
-        }
+        // if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
+        //   data[config]();
+        // } else {
+        //   console.log('Config key not found or not a function');
+        // }
+        const allowedFunctions = ['close', 'open', 'update'];
+
+      if (allowedFunctions.includes(config)) {
+        data[config](this);
+      } else {
+        console.log('Function not allowed');
+      }
       }
     });
   }
@@ -5004,7 +5058,14 @@ class Toast extends BaseComponent {
           throw new TypeError(`No method named "${config}"`);
         }
 
+        // data[config](this);
+        const allowedFunctions = ['close', 'open', 'update'];
+
+      if (allowedFunctions.includes(config)) {
         data[config](this);
+      } else {
+        console.log('Function not allowed');
+      }
       }
     });
   }

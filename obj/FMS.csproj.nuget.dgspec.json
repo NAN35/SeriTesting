@@ -1,0 +1,51 @@
+{
+  "format": 1,
+  "restore": {
+    "D:\\Akshay\\OneDrive\\Akshay_Kumar_P_B\\project\\documents\\Reports\\SSRSReport\\SeriTesting\\SeriTesting\\FMS.csproj": {}
+  },
+  "projects": {
+    "D:\\Akshay\\OneDrive\\Akshay_Kumar_P_B\\project\\documents\\Reports\\SSRSReport\\SeriTesting\\SeriTesting\\FMS.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Akshay\\OneDrive\\Akshay_Kumar_P_B\\project\\documents\\Reports\\SSRSReport\\SeriTesting\\SeriTesting\\FMS.csproj",
+        "projectName": "FMS",
+        "projectPath": "D:\\Akshay\\OneDrive\\Akshay_Kumar_P_B\\project\\documents\\Reports\\SSRSReport\\SeriTesting\\SeriTesting\\FMS.csproj",
+        "packagesPath": "C:\\Users\\aksha\\.nuget\\packages\\",
+        "outputPath": "D:\\Akshay\\OneDrive\\Akshay_Kumar_P_B\\project\\documents\\Reports\\SSRSReport\\SeriTesting\\SeriTesting\\obj\\",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "configFilePaths": [
+          "C:\\Users\\aksha\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net40"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net40": {
+            "projectReferences": {}
+          }
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net40": {
+          "dependencies": {
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.1, )"
+            }
+          }
+        }
+      }
+    }
+  }
+}

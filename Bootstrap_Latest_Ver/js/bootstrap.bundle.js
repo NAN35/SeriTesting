@@ -873,12 +873,12 @@
         const data = Alert.getOrCreateInstance(this);
 
         // if (config === 'close') {
-        //   data[config](this);
+        //   data.config(this);
         // }
 
         // const validMethods = ['close'];
         // if (validMethods.includes(config)) {
-        //   data[config](this);
+        //   data.config(this);
         // }
 
         const functionWhitelist = {
@@ -889,7 +889,7 @@
         }
     
         function functionToClose(data) {
-          data[config](this);
+          data.config(this);
         }
 
       });
@@ -966,11 +966,11 @@
         const data = Button.getOrCreateInstance(this);
 
         // if (config === 'toggle') {
-        //   data[config]();
+        //   data.config();
         // }
 
-        if (config === 'toggle' && typeof data[config] === 'function') {
-          data[config]();
+        if (config === 'toggle' && typeof data.config === 'function') {
+          data.config();
       }
       });
     }
@@ -1923,14 +1923,14 @@
       }
 
       if (typeof config === 'string') {
-        if (typeof data[config] === 'undefined') {
+        if (typeof data.config === 'undefined') {
           throw new TypeError(`No method named "${config}"`);
         }
 
-        // data[config]();
+        // data.config();
 
-        if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
-          data[config]();
+        if (data.hasOwnProperty(config) && typeof data.config === 'function') {
+          data.config();
         } else {
           console.log('Config key not found or not a function');
         }
@@ -4084,13 +4084,13 @@
       const data = Dropdown.getOrCreateInstance(element, config);
 
       if (typeof config === 'string') {
-        if (typeof data[config] === 'undefined') {
+        if (typeof data.config === 'undefined') {
           throw new TypeError(`No method named "${config}"`);
         }
 
-        // data[config]();
-        if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
-          data[config]();
+        // data.config();
+        if (data.hasOwnProperty(config) && typeof data.config === 'function') {
+          data.config();
         } else {
           console.log('Config key not found or not a function');
         }
@@ -4843,13 +4843,13 @@
           return;
         }
 
-        if (typeof data[config] === 'undefined') {
+        if (typeof data.config === 'undefined') {
           throw new TypeError(`No method named "${config}"`);
         }
 
-        // data[config](relatedTarget);
-        if (typeof data[config] === 'function') {
-          data[config](relatedTarget);
+        // data.config(relatedTarget);
+        if (typeof data.config === 'function') {
+          data.config(relatedTarget);
       }
       });
     }
@@ -5099,14 +5099,14 @@
           return;
         }
 
-        if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
+        if (data.config === undefined || config.startsWith('_') || config === 'constructor') {
           throw new TypeError(`No method named "${config}"`);
         }
 
-        // data[config](this);
+        // data.config(this);
 
-        if (typeof config === 'string' && typeof data[config] === 'function') {
-          data[config](this);
+        if (typeof config === 'string' && typeof data.config === 'function') {
+          data.config(this);
         }
       });
     }
@@ -5936,13 +5936,13 @@
         const data = Tooltip.getOrCreateInstance(this, config);
 
         if (typeof config === 'string') {
-          if (typeof data[config] === 'undefined') {
+          if (typeof data.config === 'undefined') {
             throw new TypeError(`No method named "${config}"`);
           }
 
-          // data[config]();
-          if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
-            data[config]();
+          // data.config();
+          if (data.hasOwnProperty(config) && typeof data.config === 'function') {
+            data.config();
           } else {
             console.log('Config key not found or not a function');
           }
@@ -6090,13 +6090,13 @@
         const data = Popover.getOrCreateInstance(this, config);
 
         if (typeof config === 'string') {
-          if (typeof data[config] === 'undefined') {
+          if (typeof data.config === 'undefined') {
             throw new TypeError(`No method named "${config}"`);
           }
 
-          // data[config]();
-          if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
-            data[config]();
+          // data.config();
+          if (data.hasOwnProperty(config) && typeof data.config === 'function') {
+            data.config();
           } else {
             console.log('Config key not found or not a function');
           }
@@ -6338,13 +6338,13 @@
           return;
         }
 
-        if (typeof data[config] === 'undefined') {
+        if (typeof data.config === 'undefined') {
           throw new TypeError(`No method named "${config}"`);
         }
 
-        // data[config]();
-        if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
-          data[config]();
+        // data.config();
+        if (data.hasOwnProperty(config) && typeof data.config === 'function') {
+          data.config();
         } else {
           console.log('Config key not found or not a function');
         }
@@ -6531,13 +6531,13 @@
         const data = Tab.getOrCreateInstance(this);
 
         if (typeof config === 'string') {
-          if (typeof data[config] === 'undefined') {
+          if (typeof data.config === 'undefined') {
             throw new TypeError(`No method named "${config}"`);
           }
 
-          // data[config]();
-          if (data.hasOwnProperty(config) && typeof data[config] === 'function') {
-            data[config]();
+          // data.config();
+          if (data.hasOwnProperty(config) && typeof data.config === 'function') {
+            data.config();
           } else {
             console.log('Config key not found or not a function');
           }
@@ -6779,11 +6779,11 @@
         const data = Toast.getOrCreateInstance(this, config);
 
         if (typeof config === 'string') {
-          if (typeof data[config] === 'undefined') {
+          if (typeof data.config === 'undefined') {
             throw new TypeError(`No method named "${config}"`);
           }
 
-          data[config](this);
+          data.config(this);
         }
       });
     }

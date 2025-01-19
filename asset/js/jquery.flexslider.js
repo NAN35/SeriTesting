@@ -80,13 +80,16 @@
         // // MANUAL:
         // if (vars.manualControls !== "") slider.manualControls = $(vars.manualControls).length > 0 && $(vars.manualControls);
         // CONTROLSCONTAINER:
-        if (vars.controlsContainer !== "") 
-          slider.controlsContainer = $(vars.controlsContainer).length > 0 && $(vars.controlsContainer);
+        if (vars.controlsContainer !== "") {
+          var sanitizedControlsContainer = $.escapeSelector(vars.controlsContainer);
+          slider.controlsContainer = $(sanitizedControlsContainer).length > 0 && $(sanitizedControlsContainer);
+        }
 
         // MANUAL:
-        if (vars.manualControls !== "") 
-          slider.manualControls = $(vars.manualControls).length > 0 && $(vars.manualControls);
-
+        if (vars.manualControls !== "") {
+          var sanitizedManualControls = $.escapeSelector(vars.manualControls);
+          slider.manualControls = $(sanitizedManualControls).length > 0 && $(sanitizedManualControls);
+        }
         
         // RANDOMIZE:
         if (vars.randomize) {
@@ -109,8 +112,19 @@
         if (vars.directionNav) methods.directionNav.setup();
         
         // KEYBOARD:
-        if (vars.keyboard && ($(slider.containerSelector).length === 1 || vars.multipleKeyboard)) {
-          $(document).bind('keyup', function(event) {
+        // if (vars.keyboard && ($(slider.containerSelector).length === 1 || vars.multipleKeyboard)) {
+        //   $(document).bind('keyup', function(event) {
+        //     var keycode = event.keyCode;
+        //     if (!slider.animating && (keycode === 39 || keycode === 37)) {
+        //       var target = (keycode === 39) ? slider.getTarget('next') :
+        //                    (keycode === 37) ? slider.getTarget('prev') : false;
+        //       slider.flexAnimate(target, vars.pauseOnAction);
+        //     }
+        //   });
+        // }
+
+        if (vars.keyboard && (isValidSelector(slider.containerSelector) && $(slider.containerSelector).length === 1 || vars.multipleKeyboard)) {
+          $(document).on('keyup', function(event) {
             var keycode = event.keyCode;
             if (!slider.animating && (keycode === 39 || keycode === 37)) {
               var target = (keycode === 39) ? slider.getTarget('next') :
@@ -119,6 +133,26 @@
             }
           });
         }
+        
+        /**
+         * Validates the selector to prevent XSS vulnerabilities.
+         * @param {string} selector - The selector to validate.
+         * @returns {boolean} - True if the selector is safe and valid, false otherwise.
+         */
+        function isValidSelector(selector) {
+          try {
+            // Check if the selector is a string and does not contain potentially malicious characters
+            if (typeof selector === 'string' && /^[a-zA-Z0-9\-_#.\s]+$/.test(selector)) {
+              // Attempt to use the selector in a safe context
+              return $(selector).length >= 0;
+            }
+          } catch (e) {
+            // If the selector causes an error, it's invalid
+            return false;
+          }
+          return false;
+        }
+        
         // MOUSEWHEEL:
         if (vars.mousewheel) {
           slider.bind('mousewheel', function(event, delta, deltaX, deltaY) {
@@ -505,7 +539,8 @@
         }
       },
       sync: function(action) {
-        var $obj = $(vars.sync).data("flexslider"),
+        var sanitizedSync = $.escapeSelector(vars.sync); 
+        var $obj = $(sanitizedSync).data("flexslider"),
             target = slider.animatingTo;
         
         switch (action) {

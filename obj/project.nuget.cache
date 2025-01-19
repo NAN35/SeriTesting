@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "41A5w38yOho=",
+  "success": true,
+  "projectFilePath": "D:\\Akshay\\OneDrive\\Akshay_Kumar_P_B\\project\\documents\\Reports\\SSRSReport\\SeriTesting\\SeriTesting\\FMS.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\aksha\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}

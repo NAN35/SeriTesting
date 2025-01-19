@@ -1117,8 +1117,21 @@
       return this.each(function () {
         const data = Button.getOrCreateInstance(this);
 
-        if (config === "toggle") {
-          data[config]();
+        // if (config === "toggle") {
+        //   data[config]();
+        // }
+        const allowedFunctions = {
+          toggle: () => {
+            data['toggle']();
+          }
+        };
+        
+        // Check if the given input is allowed to run a function
+        if (config in allowedFunctions) {
+          allowedFunctions[config]();
+        } else {
+          // Handle a scenario where the function is not allowed
+          console.log('Function not allowed');
         }
       });
     }
@@ -1781,8 +1794,12 @@
 
         data[action]();
       } else if (_config.interval && _config.ride) {
-        data.pause();
-        data.cycle();
+        if (data && typeof data === 'object') {
+          if (action === 'pause' && typeof data.pause === 'function') {
+            data.pause();
+            data.cycle();
+          }
+        }
       }
     }
 
@@ -2167,7 +2184,14 @@
           throw new TypeError(`No method named "${config}"`);
         }
 
-        data[config]();
+        // data[config]();
+        const allowedFunctions = ['close', 'open', 'update'];
+
+      if (allowedFunctions.includes(config)) {
+        data[config](this);
+      } else {
+        console.log('Function not allowed');
+      }
       }
     }
 
@@ -2619,7 +2643,15 @@
           throw new TypeError(`No method named "${config}"`);
         }
 
-        data[config]();
+        // data[config]();
+
+      const allowedFunctions = ['close', 'open', 'update'];
+
+      if (allowedFunctions.includes(config)) {
+        data[config](this);
+      } else {
+        console.log('Function not allowed');
+      }
       }
     }
 
