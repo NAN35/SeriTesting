@@ -192,7 +192,8 @@
 					onAfter: function() {
 						//Do we need to change the hash?
 						if(self.config.changeHash) {
-							window.location.hash = newLoc;
+							// window.location.hash = newLoc;
+							window.location.hash = encodeURIComponent(newLoc);
 						}
 						
 						//Add the auto-adjust on scroll back in

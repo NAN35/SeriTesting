@@ -8,7 +8,7 @@
  */
 
 /*!
- * jQuery JavaScript Library v1.4.1
+ * jQuery JavaScript Library V 3.7.1.
  * http://jquery.com/
  *
  * Distributed in whole under the terms of the MIT

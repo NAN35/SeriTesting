@@ -2,14 +2,15 @@ function generateData(baseval, count, yrange) {
 	var i = 0;
 	var series = [];
 	while (i < count) {
-		var x = Math.floor(Math.random() * (15 - 1 + 1)) + 1;;
-		var y = Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min;
-		var z = Math.floor(Math.random() * (55 - 5 + 1)) + 5;
-		series.push([x, y, z]);
-		baseval += 86400000;
-		i ++;
-	}
-	return series;
+        var x = getRandomSecureInt(1, 15);
+        var y = getRandomSecureInt(yrange.min, yrange.max);
+        var z = getRandomSecureInt(5, 55);
+        
+        series.push([x, y, z]);
+        baseval += 86400000;
+        i++;
+    }
+    return series;
 }
 
 var options = {

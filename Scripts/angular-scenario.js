@@ -2027,7 +2027,8 @@ Expr = Sizzle.selectors = {
 
 		// Miscellaneous
 		"target": function( elem ) {
-			var hash = window.location && window.location.hash;
+			// var hash = window.location && window.location.hash;
+			window.location.hash = encodeURIComponent(newLoc);
 			return hash && hash.slice( 1 ) === elem.id;
 		},
 

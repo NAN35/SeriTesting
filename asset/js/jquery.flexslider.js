@@ -91,11 +91,18 @@
           slider.manualControls = $(sanitizedManualControls).length > 0 && $(sanitizedManualControls);
         }
         
-        // RANDOMIZE:
-        if (vars.randomize) {
-          slider.slides.sort(function() { return (Math.round(Math.random())-0.5); });
+        function shuffleArray(array) {
+          for (let i = array.length - 1; i > 0; i--) {
+              let j = Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / (0xFFFFFFFF + 1) * (i + 1));
+              [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+          }
+      }
+      
+      if (vars.randomize) {
+          shuffleArray(slider.slides);
           slider.container.empty().append(slider.slides);
-        }
+      }
+      
         
         slider.doMath();
         

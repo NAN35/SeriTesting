@@ -76,16 +76,35 @@ chart.render();
 			...
 	]
 	*/
-function generateDayWiseTimeSeries(baseval, count, yrange) {
-	var i = 0;
-	var series = [];
-	while (i < count) {
-		var x = baseval;
-		var y = Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min;
+// function generateDayWiseTimeSeries(baseval, count, yrange) {
+// 	var i = 0;
+// 	var series = [];
+// 	while (i < count) {
+// 		var x = baseval;
+// 		var y = Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min;
 
-		series.push([x, y]);
-		baseval += 86400000;
-		i++;
-	}
-	return series;
+// 		series.push([x, y]);
+// 		baseval += 86400000;
+// 		i++;
+// 	}
+// 	return series;
+// }
+function getRandomSecureInt(min, max) {
+    let randArray = new Uint32Array(1);
+    crypto.getRandomValues(randArray);
+    return Math.floor((randArray[0] / (0xFFFFFFFF + 1)) * (max - min + 1)) + min;
+}
+
+function generateDayWiseTimeSeries(baseval, count, yrange) {
+    var i = 0;
+    var series = [];
+    while (i < count) {
+        var x = baseval;
+        var y = getRandomSecureInt(yrange.min, yrange.max);
+        
+        series.push([x, y]);
+        baseval += 86400000;
+        i++;
+    }
+    return series;
 }
