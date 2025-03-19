@@ -10251,7 +10251,7 @@ return jQuery;
 } );
 
 /**
- * @license AngularJS v1.6.6
+ * @license AngularJS v1.8.3
  * (c) 2010-2017 Google, Inc. http://angularjs.org
  * License: MIT
  */
